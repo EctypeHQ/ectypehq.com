@@ -28,7 +28,6 @@
 <link rel="stylesheet" href="styles.css">
 <script src="js/boot.js"></script>
 <script type="module" src="js/main.js"></script>
-<script type="module" src="js/uses.js"></script>
 <script type="module" src="js/agents.js"></script>
 </head>
 <body>
@@ -58,7 +57,7 @@
  <div class="hero-inner">
     <h1 id="hero-title"><span class="h1-line">Learn a table’s fingerprint.</span> <span class="h1-line">Generate rows that share it.</span></h1>
     <div class="hero-side">
-      <p class="lede">Ectype gives you realistic rows of your own table, as many as you need. It learns a small, readable <code>.dfp</code> fingerprint of how the table behaves, generates from that file alone, and checks the match against sealed evidence the generator never saw.</p>
+      <p class="lede">Ectype learns a small, readable fingerprint of your table, generates as many realistic rows as you need from it, and checks them against evidence the generator never saw.</p>
       <div class="install">
         <button class="pip" type="button" data-copy="pip install ectype-data" aria-label="Copy the command pip install ectype-data">
           <code>pip install ectype-data</code><span class="pip-note" aria-hidden="true">copy</span>
@@ -66,7 +65,7 @@
         <a class="btn" data-site="github" href="https://github.com/EctypeHQ/ectype">View on GitHub</a>
       </div>
       <p class="proof">On <span data-r="compete.datasets" data-f="int">9</span> public datasets, its default model ranks <span data-r="compete.derived.default_rank" data-f="ordinal">2nd</span> of <span data-r="compete.derived.ranked_count" data-f="int">10</span> methods at passing for real data, ahead of every deep-learning model tested, with a median fit of <span data-r="compete.derived.by_id.ectype.fit_seconds_median" data-f="mean0">10</span> seconds on a CPU. <a href="#results">See the head-to-head</a>.</p>
-      <p class="fine">Open source under Apache-2.0. Runs on your machine. <a data-site="docs" href="https://github.com/EctypeHQ/ectype/blob/main/docs/guide/README.md">Read the guide</a>.</p>
+      <p class="fine">Open source, Apache-2.0. Runs on your machine.</p>
     </div>
 
   <figure class="plate cloud" id="fig1" aria-labelledby="fig1-cap" data-view="side">
@@ -109,19 +108,19 @@
     <div class="split-head">
       <h2 id="how-title">A fingerprint is a file you can read</h2>
       <div>
-        <p>A <code>.dfp</code> file is JSON plus NumPy arrays plus checksums. It holds measurements and a model, never raw rows, so you can inspect it, diff it and keep it in version control.</p>
-        <p class="size-note">The fingerprint behind Fig. 3 is <strong data-r="demo.fingerprint_bytes" data-f="kb">335.8 kB</strong> for a <span data-r="demo.dataset.rows_train" data-f="int">24,000</span>-row table.</p>
+        <p>Measurements and a model, never raw rows. Inspect it, diff it, commit it.</p>
+        <p class="size-note">The fingerprint behind Fig. 3: <strong data-r="demo.fingerprint_bytes" data-f="kb">335.8 kB</strong> for a <span data-r="demo.dataset.rows_train" data-f="int">24,000</span>-row table.</p>
       </div>
     </div>
 
     <div class="filewin">
       <p class="filewin-bar"><span class="filewin-name">customers.dfp</span><span class="filewin-kind">a ZIP archive: open it with any ZIP tool</span></p>
       <dl class="anatomy" aria-label="What is inside a fingerprint file">
-        <div><dt><code>manifest.json</code><span>Manifest</span></dt><dd>JSON with a published JSON Schema: the disclosure policy, the columns and the format version.</dd></div>
-        <div><dt><code>arrays/&lt;name&gt;.npy</code><span>Model</span></dt><dd>A fitted model of every column, the dependence between them, missingness, constraints and relationships between tables.</dd></div>
-        <div><dt><code>targets/calibration.json</code><span>Calibration targets</span></dt><dd>Measurements of the source that the optimizer fits to. A pass confirms the fit; the sealed targets are the independent check.</dd></div>
-        <div class="sealed"><dt><code>targets/sealed.json</code><span>Sealed targets</span></dt><dd>Measurements hash-committed at fit time and kept from the optimizer. Only validation and drift comparison open them, and a tampered seal is detected.</dd></div>
-        <div><dt><code>checksums.sha256</code><span>Checksums</span></dt><dd>Every array is checked on load. Loading fails closed on tampered, oversized or malformed archives.</dd></div>
+        <div><dt><code>manifest.json</code><span>Manifest</span></dt><dd>Columns and disclosure policy, under a published JSON Schema.</dd></div>
+        <div><dt><code>arrays/&lt;name&gt;.npy</code><span>Model</span></dt><dd>Every column and the dependence between them.</dd></div>
+        <div><dt><code>targets/calibration.json</code><span>Calibration targets</span></dt><dd>What the optimizer fits to.</dd></div>
+        <div class="sealed"><dt><code>targets/sealed.json</code><span>Sealed targets</span></dt><dd>Hash-committed, kept from the optimizer.</dd></div>
+        <div><dt><code>checksums.sha256</code><span>Checksums</span></dt><dd>Tampered files fail to load.</dd></div>
       </dl>
     </div>
 
@@ -187,20 +186,19 @@
       <figcaption id="flow-cap" class="sr-only">Fit reads your table once and writes the fingerprint file. Generate draws synthetic rows from the file alone. Validate checks those rows against the file’s sealed targets and writes a report that passes or fails. Compare reads two fingerprints and reports which columns and pairs moved, with no rows and no generation.</figcaption>
     </figure>
 
-    <ol class="loop" aria-label="The four operations">
-      <li><h3>Fit</h3><p>Learn the fingerprint from your table under a disclosure policy. This is the only step that needs the source data.</p></li>
-      <li><h3>Generate</h3><p>Draw any number of rows from the file, on any machine. The same seed gives the same rows, in parallel or not.</p></li>
-      <li><h3>Validate</h3><p>Score the rows on calibration, sealed and optional holdout evidence, reported separately and never merged into one score.</p></li>
-      <li><h3>Compare</h3><p>Put two fingerprints side by side to find which columns and pairs drifted, with no data and no generation.</p></li>
-    </ol>
   </div>
 
   <div class="run">
     <figure class="run-inner" aria-labelledby="run-cap">
       <figcaption id="run-cap" class="run-cap">
-        <p>The same loop on the command line, on an example customers table: fit with the defaults, generate, validate. Under each command is what it printed. Long lines are shortened and a few are left out.</p>
-        <p class="run-exit"><code>validate</code> ends with <code>RESULT: PASSED</code> or <code>RESULT: FAILED</code> and exits 1 on failure, so it can gate a script or a CI job.</p>
-        <p class="run-links"><button type="button" class="copy" data-copy="ectype profile customers.parquet -o customers.dfp --constraint &quot;signup_date &lt;= last_order_date&quot; --derived &quot;total=quantity * unit_price&quot;&#10;ectype generate customers.dfp --rows 5000 --seed 42 -o synthetic.parquet&#10;ectype validate customers.dfp synthetic.parquet --html report.html" aria-label="Copy the three commands">Copy the commands</button> <a data-site="docs" href="https://github.com/EctypeHQ/ectype/blob/main/docs/guide/README.md">Read the guide</a></p>
+        <p>The loop on the command line, as printed (long lines shortened).</p>
+        <ol class="run-key" aria-label="How to read the validation">
+          <li><b>Calibration</b>: what the optimizer fitted to. Never decides.</li>
+          <li><b>Sealed</b>: held back from it. These decide.</li>
+          <li>A miss within sampling noise does not fail.</li>
+        </ol>
+        <p class="run-exit"><code>validate</code> exits 1 on failure, so it can gate CI.</p>
+        <p class="run-links"><button type="button" class="copy" data-copy="ectype profile customers.parquet -o customers.dfp --constraint &quot;signup_date &lt;= last_order_date&quot; --derived &quot;total=quantity * unit_price&quot;&#10;ectype generate customers.dfp --rows 5000 --seed 42 -o synthetic.parquet&#10;ectype validate customers.dfp synthetic.parquet --html report.html" aria-label="Copy the three commands">Copy the commands</button></p>
       </figcaption>
       <div class="term" id="session">
         <p class="term-bar"><span>Terminal</span></p>
@@ -215,9 +213,9 @@
   note: constraint 'user_1' holds by construction (…); still checked on every row</span></span></span><span class="blk"><span class="cmd">ectype validate customers.dfp synthetic.parquet --html report.html</span><span class="out">Validation <span class="pass">PASSED</span>  fingerprint 19f9bc3d9701  policy=standard  rows=5000
   structural   5/5 checks ok
   constraints  1/1 hard constraints satisfied
-  <span class="dim">calibration  44/46 passed (95.7%) (optimizer evidence only)</span>
-  <span class="lit">sealed       39/40 passed (97.5%) (primary evidence of fidelity)</span>
-               <span class="lit">0 failed beyond sampling noise (sensitivity standard, FDR q=0.05)</span>
+  <span class="dim">calibration  44/46 passed (95.7%) (optimizer evidence only)</span><span class="mk" aria-hidden="true">1</span>
+  <span class="lit">sealed       39/40 passed (97.5%) (primary evidence of fidelity)</span><span class="mk" aria-hidden="true">2</span>
+               <span class="lit">0 failed beyond sampling noise (sensitivity standard, FDR q=0.05)</span><span class="mk" aria-hidden="true">3</span>
   calibration - sealed pass-rate gap: -1.8 pts
 wrote report.html
 RESULT: <span class="pass">PASSED</span></span></span></code></pre>
@@ -233,8 +231,7 @@ RESULT: <span class="pass">PASSED</span></span></span></code></pre>
   <div class="split-head">
     <h2 id="profile-title">Read a table from its fingerprint</h2>
     <div>
-      <p><code>ectype report</code> turns a fingerprint into one self-contained page: each column’s distribution, how the columns move together, what is missing, the relationships found and what the privacy policy did. Give it two fingerprints and it shows what drifted between them.</p>
-      <p>The page is built from the fingerprint alone, so it can go wherever the fingerprint can, even where the data cannot. In Python, <code>ectype.report(fp)</code>.</p>
+      <p><code>ectype report</code> draws one page from the fingerprint alone, so it can go where the data cannot. Give it two and it shows what drifted.</p>
     </div>
   </div>
 
@@ -244,14 +241,14 @@ RESULT: <span class="pass">PASSED</span></span></span></code></pre>
         <p class="pshot-bar"><code>ectype report beijing-2013.dfp</code></p>
         <img src="img/report-profile.webp" width="1600" height="1218" loading="lazy" decoding="async" alt="Six column cards from the profile report: TEMP, drawn as its gap above DEWP, and PRES as histograms with their medians marked, cbwd as bars of wind-direction shares, Iws with its point masses drawn apart from the curve, and Is and Ir, where one value holds most rows.">
       </div>
-      <figcaption id="pshot-a-cap">Six of the <span data-r="profile.columns" data-f="int">12</span> column cards from the profile of a year of hourly air-quality readings in Beijing, <span data-r="profile.rows" data-f="int">8,760</span> rows (<span data-r="profile.source">UCI Beijing PM2.5, public, CC BY 4.0</span>). Every chart is redrawn from the fingerprint. <a href="example-report.html">Open the full report</a></figcaption>
+      <figcaption id="pshot-a-cap">Six of <span data-r="profile.columns" data-f="int">12</span> column cards: a year of hourly air quality in Beijing, <span data-r="profile.rows" data-f="int">8,760</span> rows (<span data-r="profile.source">UCI Beijing PM2.5, public, CC BY 4.0</span>). <a href="example-report.html">Open the full report</a></figcaption>
     </figure>
     <figure class="pshot" aria-labelledby="pshot-b-cap">
       <div class="pshot-plate">
         <p class="pshot-bar"><code>ectype report beijing-2013.dfp beijing-2014.dfp</code></p>
         <img src="img/report-comparison.webp" width="1600" height="1005" loading="lazy" decoding="async" alt="The comparison report’s “What changed” section: three column cards, TEMP, PRES and DEWP, each drawing 2013 as purple bars and 2014 as a teal outline on one axis, with the medians and middle halves of both years side by side.">
       </div>
-      <figcaption id="pshot-b-cap">The same year against the next: <span data-r="profile.drifted_columns" data-f="int">3</span> of <span data-r="profile.columns" data-f="int">12</span> columns drifted, each drawn with both years on one axis. <a href="example-comparison.html">Open the comparison</a></figcaption>
+      <figcaption id="pshot-b-cap">The next year against it: <span data-r="profile.drifted_columns" data-f="int">3</span> of <span data-r="profile.columns" data-f="int">12</span> columns drifted. <a href="example-comparison.html">Open the comparison</a></figcaption>
     </figure>
   </div>
 </section>
@@ -263,20 +260,20 @@ RESULT: <span class="pass">PASSED</span></span></span></code></pre>
   <div class="split-head">
     <h2 id="res-title">Closer to real data than every deep-learning synthesizer we tested</h2>
     <div>
-      <p>A head-to-head on <span data-r="compete.datasets" data-f="int">9</span> public datasets with <span data-r="compete.seeds" data-f="int">5</span> seeds each, every competitor at its library defaults, every score taken on held-out real rows that no method saw. Ectype at its defaults reaches a quality score of <span data-r="compete.derived.by_id.ectype.quality" data-f="mean3">0.975</span>; real data scored against real data reaches <span data-r="compete.derived.by_id.real-train.quality" data-f="mean3">0.981</span>.</p>
+      <p><span data-r="compete.datasets" data-f="int">9</span> public datasets, <span data-r="compete.seeds" data-f="int">5</span> seeds, every method at its defaults, every score on held-out real rows. Ectype’s quality score: <span data-r="compete.derived.by_id.ectype.quality" data-f="mean3">0.975</span>. Real data against itself: <span data-r="compete.derived.by_id.real-train.quality" data-f="mean3">0.981</span>.</p>
       <p class="measured">Measured <time datetime="2026-11-27" data-r="compete.report_date" data-f="date">27 November 2026</time> on ectype <span data-r="compete.engine_version">0.1.0</span>.</p>
     </div>
   </div>
 
   <dl class="h2h-stats">
-    <div><dt>Of <span data-r="compete.derived.ranked_count" data-f="int">10</span> methods on the classifier test, with a mean rank of <span data-r="compete.derived.by_id.ectype.mean_rank_classifier" data-f="mean1">2.6</span> across datasets</dt><dd><span data-r="compete.derived.default_rank" data-f="ordinal">2nd</span></dd></div>
-    <div><dt>Median fit, on a CPU. The deep-learning models need a GPU and <span data-r="compete.derived.deep_fit_minutes_range" data-f="range1">2.3 to 6.5</span> minutes.</dt><dd><span data-r="compete.derived.by_id.ectype.fit_seconds_median" data-f="mean0">10</span><span class="unit"> s</span></dd></div>
-    <div><dt>Of the real-data predictive score that models trained on Ectype’s rows keep (median)</dt><dd><span data-r="compete.derived.by_id.ectype.utility_median" data-f="pct1">97.8%</span></dd></div>
-    <div><dt>Highest membership-inference AUC on any dataset, where 0.5 is chance</dt><dd><span data-r="compete.derived.by_id.ectype.membership_auc_worst_dataset" data-f="mean3">0.508</span></dd></div>
+    <div><dt>of <span data-r="compete.derived.ranked_count" data-f="int">10</span> methods at passing for real data (mean rank <span data-r="compete.derived.by_id.ectype.mean_rank_classifier" data-f="mean1">2.6</span>)</dt><dd><span data-r="compete.derived.default_rank" data-f="ordinal">2nd</span></dd></div>
+    <div><dt>median fit on a CPU. Deep models: a GPU and <span data-r="compete.derived.deep_fit_minutes_range" data-f="range1">2.3 to 6.5</span> minutes.</dt><dd><span data-r="compete.derived.by_id.ectype.fit_seconds_median" data-f="mean0">10</span><span class="unit"> s</span></dd></div>
+    <div><dt>of the real-data model score kept (median)</dt><dd><span data-r="compete.derived.by_id.ectype.utility_median" data-f="pct1">97.8%</span></dd></div>
+    <div><dt>worst membership-inference AUC on any dataset; 0.5 is chance</dt><dd><span data-r="compete.derived.by_id.ectype.membership_auc_worst_dataset" data-f="mean3">0.508</span></dd></div>
   </dl>
 
   <figure class="h2h-fig" aria-labelledby="fig2-cap">
-    <p class="fig-title"><span class="fig-no">Fig. 2</span> How easily a classifier tells each method’s rows from real ones. Shorter bars pass for real data more often; at 0.5 the classifier is guessing.</p>
+    <p class="fig-title"><span class="fig-no">Fig. 2</span> How easily a classifier tells each method’s rows from real ones. Shorter is better; at 0.5 it is guessing.</p>
     <div class="h2h" aria-hidden="true">
 <!-- bake:compete-chart -->
 <div class="h2h-axis"><span>Method</span><div class="h2h-ticks"><span>0.5</span><span>0.6</span><span>0.7</span><span>0.8</span><span>0.9</span><span>1.0</span></div><span>AUC</span></div>
@@ -295,7 +292,7 @@ RESULT: <span class="pass">PASSED</span></span></span></code></pre>
 <!-- /bake:compete-chart -->
     </div>
     <figcaption id="fig2-cap">
-      <span class="fig-no">Fig. 2.</span> Mean ROC AUC of a gradient-boosted classifier separating synthetic rows from held-out real rows, over <span data-r="compete.datasets" data-f="int">9</span> datasets and <span data-r="compete.seeds" data-f="int">5</span> seeds, with Ectype on a CPU and the deep-learning models on a GPU; the table below lists the same values. Ectype’s default model was tuned on <span data-r="compete.derived.tuned.count" data-f="int">2</span> of the <span data-r="compete.datasets" data-f="int">9</span> datasets (<span data-r="compete.derived.tuned.names">Adult and Credit Default</span>). The diffusion model failed on <span data-r="compete.derived.by_id.synthcity-ddpm.runs_failed" data-f="int">2</span> of its <span data-r="compete.derived.runs_per_method" data-f="int">45</span> runs.
+      <span class="fig-no">Fig. 2.</span> Mean ROC AUC of a gradient-boosted classifier, synthetic against held-out real rows. Ectype’s default was tuned on <span data-r="compete.derived.tuned.count" data-f="int">2</span> of the <span data-r="compete.datasets" data-f="int">9</span> datasets (<span data-r="compete.derived.tuned.names">Adult and Credit Default</span>); the diffusion model failed <span data-r="compete.derived.by_id.synthcity-ddpm.runs_failed" data-f="int">2</span> of its <span data-r="compete.derived.runs_per_method" data-f="int">45</span> runs.
     </figcaption>
   </figure>
  </div>
@@ -303,13 +300,13 @@ RESULT: <span class="pass">PASSED</span></span></span></code></pre>
 
  <div class="results-rest">
   <div class="h2h-notes">
-    <p>First place on the classifier test goes to sequential trees (CART), on all <span data-r="compete.derived.leader.wins" data-f="int">9</span> datasets. Each value they emit is sampled from a real training row, and they have the highest worst-case membership-inference score of any method tested: <span data-r="compete.derived.leader.membership_auc_worst_dataset" data-f="mean3">0.533</span>, against <span data-r="compete.derived.by_id.ectype.membership_auc_worst_dataset" data-f="mean3">0.508</span> for Ectype.</p>
-    <p>Beyond the benchmark, Ectype runs on <span data-r="robustness.tables" data-f="int">29</span> further public government, health and finance tables, from <span data-r="robustness.rows_min" data-f="int">184</span> rows to <span data-r="robustness.rows_max" data-f="int">60,000</span>-row samples and up to <span data-r="robustness.columns_max" data-f="int">287</span> columns, with no failures.</p>
+    <p>First place, on all <span data-r="compete.derived.leader.wins" data-f="int">9</span> datasets, goes to sequential trees (CART), which sample each value from a real training row and have the highest worst-case membership AUC of any method tested: <span data-r="compete.derived.leader.membership_auc_worst_dataset" data-f="mean3">0.533</span>, against <span data-r="compete.derived.by_id.ectype.membership_auc_worst_dataset" data-f="mean3">0.508</span> for Ectype.</p>
+    <p>Beyond the benchmark: <span data-r="robustness.tables" data-f="int">29</span> more public tables, <span data-r="robustness.rows_min" data-f="int">184</span> to <span data-r="robustness.rows_max" data-f="int">60,000</span> rows and up to <span data-r="robustness.columns_max" data-f="int">287</span> columns, with no failures.</p>
   </div>
 
   <details class="h2h-more">
-  <summary><span id="h2h-cap-t">Every method side by side</span><span class="sum-hint">classifier AUC, rank, quality, utility, membership AUC, fit time and hardware</span></summary>
-  <p class="table-note" id="h2h-cap">Classifier AUC and quality are means over <span data-r="compete.datasets" data-f="int">9</span> datasets and <span data-r="compete.seeds" data-f="int">5</span> seeds, utility is the median share of the real-data score kept, and membership AUC is the worst single dataset. Lower is better for classifier AUC, rank and membership AUC. The real-data row is the training split scored as if it were synthetic: it marks each metric’s best value and shows that the attack catches copied rows. “Ectype” is the default, <code>ectype.fit(df)</code> with nothing passed; a row named “Ectype, …” changes one setting, such as <code>effort="fast"</code>.</p>
+  <summary><span id="h2h-cap-t">Every method side by side</span><span class="sum-hint">all seven measures</span></summary>
+  <p class="table-note" id="h2h-cap">Lower is better for classifier AUC, rank and membership AUC. “Ectype” is <code>ectype.fit(df)</code>; “Ectype, …” changes one setting.</p>
     <div class="table-scroll" tabindex="0" role="region" aria-labelledby="h2h-cap-t">
       <table class="h2h-table">
         <caption class="sr-only">Every method in the head-to-head, with classifier AUC, mean rank, quality, utility, worst-case membership AUC, median fit time and hardware</caption>
@@ -333,7 +330,7 @@ RESULT: <span class="pass">PASSED</span></span></span></code></pre>
       </table>
     </div>
   </details>
-  <p class="source">Every number, every method and every dataset, including where others lead, is in <a data-site="compete" href="https://github.com/EctypeHQ/ectype/blob/main/docs/results/compete.md">the report</a>.</p>
+  <p class="source"><a class="more" data-site="compete" href="https://github.com/EctypeHQ/ectype/blob/main/docs/results/compete.md">How this was measured</a> Every dataset and setting, including where others lead.</p>
  </div>
 </section>
 
@@ -342,7 +339,7 @@ RESULT: <span class="pass">PASSED</span></span></span></code></pre>
   <div class="split-head">
     <h2 id="ev-title">Same columns, different print</h2>
     <div>
-      <p>Ectype and the independent-columns baseline share the same fitted model of each column, so one column at a time they look alike. The difference is how the columns move together: payment status this month and last, one bill and the next. Fig. 3 shows all of those pairs at once.</p>
+      <p>Column by column, Ectype and an independent-columns baseline look alike. How columns move together is the difference.</p>
     </div>
   </div>
 
@@ -369,7 +366,7 @@ RESULT: <span class="pass">PASSED</span></span></span></code></pre>
       <div class="spec-side">
         <div class="key">
           <svg id="scale" viewBox="0 0 220 34" aria-hidden="true" focusable="false"></svg>
-          <p>Colour shows ρ from −1 (rose) through 0 (white) to +1 (teal); hatching marks ρ at or below −0.15, so the sign never rests on colour alone. Both panels list the columns in the same order, top to bottom and left to right.</p>
+          <p>ρ from −1 (rose) through 0 (white) to +1 (teal); hatching marks ρ at or below −0.15. Both panels share one column order.</p>
         </div>
         <p class="readout" id="readout" aria-live="polite">Point at a cell, or tab to panel b and use the arrow keys, to read both values.</p>
         <ol class="notes" id="notes" aria-label="Annotations"></ol>
@@ -382,7 +379,7 @@ RESULT: <span class="pass">PASSED</span></span></span></code></pre>
 
     <figcaption id="fig3-cap">
       <p class="status" data-status hidden></p>
-      <span class="fig-no">Fig. 3.</span> Real output of ectype <span data-r="demo.engine.version">0.1.0</span> on the public UCI Default of Credit Card Clients table (CC BY 4.0), fitted on <span data-r="demo.dataset.rows_train" data-f="int">24,000</span> rows with the default settings (the chain model). <b>a</b>, <span data-r="demo.dataset.rows_holdout" data-f="int">6,000</span> real rows the profiler never saw. <b>b</b>, the same number of generated rows; the independent-columns baseline uses the same column models with no dependence, and the control shows the real rows again. Markers 1–3 are the annotated blocks; their mean ρ recomputes when panel b changes. <b>c–f</b>, marginal histograms: the purple outline is real, the bars are panel b, and TV is total-variation distance (0 means identical). One run; Fig. 2 covers <span data-r="compete.datasets" data-f="int">9</span> datasets and <span data-r="compete.seeds" data-f="int">5</span> seeds.
+      <span class="fig-no">Fig. 3.</span> Real output of ectype <span data-r="demo.engine.version">0.1.0</span> at its defaults on the public UCI Default of Credit Card Clients table (CC BY 4.0), fitted on <span data-r="demo.dataset.rows_train" data-f="int">24,000</span> rows. <b>a</b>, <span data-r="demo.dataset.rows_holdout" data-f="int">6,000</span> held-out real rows. <b>b</b>, as many generated rows. <b>c–f</b>, histograms: purple outline real, bars panel b; TV is total-variation distance (0 is identical). One run.
     </figcaption>
   </figure>
 </section>
@@ -391,312 +388,54 @@ RESULT: <span class="pass">PASSED</span></span></span></code></pre>
 <section class="marks" id="features" aria-labelledby="marks-title">
   <div class="split-head">
     <h2 id="marks-title">What makes the match trustworthy</h2>
-    <div><p>Ectype tests its own rows against evidence held back from the generator, replaces personal details by default, and keeps the rules your data obeys on every generated row. These details are to Ectype what minutiae are to a print: what make a match one you can rely on.</p></div>
+    <div><p>Held-back evidence, personal details replaced by default, and your rules on every row.</p></div>
   </div>
 
   <div class="mark-lead">
     <h3>Sealed evidence</h3>
-    <p>Every fingerprint splits its measurements in two. Calibration targets are what the optimizer sees. Sealed targets are hash-committed when you fit and opened only by the validator, so a pass on them is evidence the generator could not have tuned for. The verdict allows for chance: a sealed target fails when it misses by more than sampling noise explains, with the false discovery rate controlled at q = <span data-r="validation.fdr_q" data-f="mean2">0.05</span> across all targets.</p>
+    <p>Sealed targets are hash-committed when you fit and opened only by the validator, so a pass is evidence the generator could not tune for. False discovery rate held at q = <span data-r="validation.fdr_q" data-f="mean2">0.05</span>.</p>
   </div>
 
-  <figure class="report" aria-labelledby="report-cap">
-    <div class="term term-report">
-      <p class="term-bar"><span>ectype validate customers.dfp synthetic.parquet --html report.html</span></p>
-<pre tabindex="0" aria-label="Validation summary from the session above, which passes"><code>Validation <span class="pass">PASSED</span>  fingerprint 19f9bc3d9701  policy=standard  rows=5000
-  structural   5/5 checks ok
-  constraints  1/1 hard constraints satisfied
-  <span class="dim">calibration  44/46 passed (95.7%) (optimizer evidence only)</span><span class="mk" aria-hidden="true">1</span>
-  <span class="lit">sealed       39/40 passed (97.5%) (primary evidence of fidelity)</span><span class="mk" aria-hidden="true">2</span>
-               <span class="lit">0 failed beyond sampling noise (sensitivity standard, FDR q=0.05)</span><span class="mk" aria-hidden="true">3</span>
-  calibration - sealed pass-rate gap: -1.8 pts<span class="mk" aria-hidden="true">4</span>
-<span class="dim">    worst calibration: bivariate.spearman:income|unit_price  d=0.08688 tol=0.06108
-    worst calibration: bivariate.spearman:age|unit_price  d=0.08874 tol=0.07828</span>
-    worst sealed: bivariate.kendall:income|unit_price  d=0.05335 tol=0.05<span class="mk" aria-hidden="true">5</span>
-RESULT: <span class="pass">PASSED</span></code></pre>
-    </div>
-    <ol class="report-notes" aria-label="How to read the report">
-      <li><b>Calibration</b> is what the optimizer fitted to. It is reported, and it never decides the result.</li>
-      <li><b>Sealed</b> targets are opened from the seal. With the structural checks and hard constraints, they decide the result.</li>
-      <li>One sealed target missed its tolerance, but by less than sampling noise explains, so the report passes.</li>
-      <li>The gap is the calibration pass rate minus the sealed one. A large positive gap means the model meets what it was tuned on but not what was held back.</li>
-      <li>That one miss: <code>d</code> is the distance between the generated rows and the sealed measurement, <code>tol</code> the distance allowed.</li>
-    </ol>
-    <figcaption id="report-cap">The summary <code>ectype validate</code> printed in the session above.</figcaption>
-  </figure>
-
-  <div class="mark-lead">
-    <h3>Personal details replaced by default</h3>
-    <p>Ectype recognises columns of names, phone numbers, email addresses and address lines, and replaces each value with a consistent stand-in: the same customer gets the same stand-in every time, so repeat customers stay repeat customers and no real name appears. Unique keys are regenerated, never copied, and keys that point to another record come out as fresh keys with the source’s repeat pattern. On a real <span data-r="pii.table_rows" data-f="million1">2.4 million</span>-row public-records table, no synthetic row carried a real name or phone number.</p>
-  </div>
-
-  <ul class="mark-list">
+  <ul class="mark-list mark-four">
     <li>
-      <h3>A disclosure policy on every fit</h3>
-      <p>Each fingerprint is fitted under <code>strict</code>, <code>standard</code> or <code>research</code>. The policy pools rare categories, coarsens quantiles and keeps exact extremes out. A built-in attack suite runs membership inference, distance to closest record and attribute inference against null distributions. Policies reduce risk. The suite’s scores are measured attack results on generated data, not a formal guarantee such as differential privacy.</p>
+      <h3>Personal details replaced</h3>
+      <p>Names, phones, emails and addresses get consistent stand-ins. On a real <span data-r="pii.table_rows" data-f="million1">2.4 million</span>-row public-records table, no synthetic row carried a real name or phone number.</p>
     </li>
     <li>
-      <h3>A file that cannot run code</h3>
-      <p>No pickle and no <code>eval</code>. Loading a <code>.dfp</code> never executes anything, and a published JSON Schema lets any language read it.</p>
+      <h3>Privacy, measured</h3>
+      <p>Every fit runs under a disclosure policy; a built-in attack suite measures what an attacker could learn. Measured, not a formal bound such as differential privacy.</p>
+      <p class="more-line"><a class="more" data-site="privacy" href="https://github.com/EctypeHQ/ectype/blob/main/docs/guide/12-privacy.md">How privacy is measured</a></p>
     </li>
     <li>
-      <h3>Drift detection without generating</h3>
-      <p>Compare last month’s fingerprint with this month’s and see which columns and pairs moved beyond sampling noise. An inconclusive comparison never passes as “no drift”, and <code>ectype compare --fail-on-drift</code> drops into CI.</p>
+      <h3>Rules on every row</h3>
+      <p>Dates stay in order, totals add up, and rules you declare, such as <code>start &lt;= end</code>, hold on every row. Multi-table schemas keep <span data-r="claims.referential_integrity_pct" data-f="int">100</span>% referential integrity.</p>
     </li>
     <li>
-      <h3>Relationships found and held</h3>
-      <p>Ectype finds the structure in a table and builds it into every row: dates stay in order, computed columns such as a weekday or <code>total = qty * price</code> are computed, parts add up to their total, a repeated customer keeps the same attributes, and dates keep their weekly pattern. Declare rules such as <code>start &lt;= end</code> yourself, or confirm the ones it suggests, and they hold on every generated row.</p>
-    </li>
-    <li>
-      <h3>Time series and multi-table</h3>
-      <p>Trend, seasonality and autoregressive models, panels of entities and event streams. Multi-table schemas keep <span data-r="claims.referential_integrity_pct" data-f="int">100</span>% referential integrity.</p>
-    </li>
-    <li>
-      <h3>Fully local</h3>
-      <p>Fit, generate and validate on a laptop, in CI or on an air-gapped server, with no cloud, GPU or LLM. A <span data-r="scale.rows" data-f="million1">2.4 million</span>-row, <span data-r="scale.columns" data-f="int">78</span>-column table fits on a desktop CPU.</p>
+      <h3>Local, and safe to load</h3>
+      <p>No cloud, GPU or LLM: a <span data-r="scale.rows" data-f="million1">2.4 million</span>-row, <span data-r="scale.columns" data-f="int">78</span>-column table fits on a desktop CPU. Loading a <code>.dfp</code> never runs code.</p>
     </li>
   </ul>
 </section>
 
-<!-- 6. Uses, by industry and by job. Source: ectype/docs/use-cases.md -->
+<!-- 6. Uses. The full list, by job and by industry, is docs/use-cases.md in the public repository. -->
 <section class="uses" id="uses" aria-labelledby="uses-title">
   <div class="split-head">
     <h2 id="uses-title">What people use it for</h2>
     <div>
-      <p>Anywhere real data is needed but hard to use: it is locked down, it holds personal details, there is not enough of it, or it does not exist yet. Everything listed here works with the current release.</p>
+      <p>Wherever real data is locked down, personal, scarce or not collected yet.</p>
     </div>
   </div>
 
-  <fieldset class="switch uses-switch">
-    <legend>Show uses</legend>
-    <label><input type="radio" name="uses-view" value="industry" checked><span>By industry</span></label>
-    <label><input type="radio" name="uses-view" value="job"><span>By the job to be done</span></label>
-  </fieldset>
+  <ul class="mark-list uses-list">
+    <li><h3>Build and test software</h3><p>Staging data with production’s odd cases, load tests at a thousand times the volume, fresh CI data.</p></li>
+    <li><h3>Develop analytics and models</h3><p>Start on features and dashboards while access to the real data is in review.</p></li>
+    <li><h3>Share data across a boundary</h3><p>With teams, partners, auditors or researchers, and across regions.</p></li>
+    <li><h3>Watch for change</h3><p>Fail a build when an upstream feed changes shape.</p></li>
+    <li><h3>Explore what could happen</h3><p>Shift an average or add rare cases, then generate that world.</p></li>
+    <li><h3>Teach, demonstrate and sell</h3><p>Demos and classroom data with realistic mess, free to hand out.</p></li>
+  </ul>
 
-  <div class="uses-part uses-industry" id="uses-industry" data-part="industry">
-    <h3 class="uses-part-title">By industry</h3>
-    <ul class="uses-index" aria-label="Industries">
-      <li><a href="#use-banking" aria-controls="use-banking">Banking and payments</a></li>
-      <li><a href="#use-insurance" aria-controls="use-insurance">Insurance</a></li>
-      <li><a href="#use-health" aria-controls="use-health">Healthcare and life sciences</a></li>
-      <li><a href="#use-retail" aria-controls="use-retail">Retail and e-commerce</a></li>
-      <li><a href="#use-telecom" aria-controls="use-telecom">Telecommunications</a></li>
-      <li><a href="#use-manufacturing" aria-controls="use-manufacturing">Manufacturing and industrial</a></li>
-      <li><a href="#use-energy" aria-controls="use-energy">Energy and utilities</a></li>
-      <li><a href="#use-logistics" aria-controls="use-logistics">Logistics and transportation</a></li>
-      <li><a href="#use-government" aria-controls="use-government">Government and public sector</a></li>
-      <li><a href="#use-education" aria-controls="use-education">Education and academic research</a></li>
-      <li><a href="#use-hr" aria-controls="use-hr">Human resources and workforce</a></li>
-      <li><a href="#use-marketing" aria-controls="use-marketing">Marketing, advertising and customer analytics</a></li>
-      <li><a href="#use-saas" aria-controls="use-saas">Software and SaaS</a></li>
-      <li><a href="#use-security" aria-controls="use-security">Cybersecurity and IT operations</a></li>
-      <li><a href="#use-realestate" aria-controls="use-realestate">Real estate and construction</a></li>
-      <li><a href="#use-nonprofit" aria-controls="use-nonprofit">Nonprofits and international development</a></li>
-    </ul>
-    <div class="uses-groups">
-      <div class="use-group" id="use-banking">
-        <h4>Banking and payments</h4>
-        <ul>
-          <li>Transaction tables for testing fraud rules and monitoring systems.</li>
-          <li>Customer and account tables for building onboarding and servicing software.</li>
-          <li>Loan applications for developing and explaining credit models before production access.</li>
-          <li>Month-over-month drift checks on feeds from core systems.</li>
-        </ul>
-      </div>
-      <div class="use-group" id="use-insurance">
-        <h4>Insurance</h4>
-        <ul>
-          <li>Policy and claims tables for pricing and reserving prototypes.</li>
-          <li>Claims histories with realistic delays between events, for workflow testing.</li>
-          <li>Shareable samples for reinsurers, brokers and actuarial consultants.</li>
-        </ul>
-      </div>
-      <div class="use-group" id="use-health">
-        <h4>Healthcare and life sciences</h4>
-        <ul>
-          <li>Encounter, claims and billing tables for building and testing health IT systems.</li>
-          <li>Lifelike tables for teaching clinical coding, analytics and epidemiology.</li>
-          <li>Trial-style tables for designing analyses and checking pipelines before unblinding.</li>
-          <li>Hospital operations data (admissions, bed use, waiting times) for capacity planning tools.</li>
-        </ul>
-      </div>
-      <div class="use-group" id="use-retail">
-        <h4>Retail and e-commerce</h4>
-        <ul>
-          <li>Orders, baskets and returns for testing recommendation, pricing and promotion systems.</li>
-          <li>Store-by-day sales series for trying forecasting methods.</li>
-          <li>Customer tables for building loyalty and segmentation tools without real customers.</li>
-          <li>Supplier and inventory tables for testing replenishment logic at scale.</li>
-        </ul>
-      </div>
-      <div class="use-group" id="use-telecom">
-        <h4>Telecommunications</h4>
-        <ul>
-          <li>Call and usage records for billing and rating tests.</li>
-          <li>Subscriber tables for churn analysis prototypes.</li>
-          <li>Network event streams for testing alerting and capacity tools.</li>
-        </ul>
-      </div>
-      <div class="use-group" id="use-manufacturing">
-        <h4>Manufacturing and industrial</h4>
-        <ul>
-          <li>Sensor and machine logs for testing monitoring and maintenance software.</li>
-          <li>Quality inspection tables for process-control dashboards.</li>
-          <li>Production orders and bills of materials for planning-system tests.</li>
-        </ul>
-      </div>
-      <div class="use-group" id="use-energy">
-        <h4>Energy and utilities</h4>
-        <ul>
-          <li>Meter readings for billing, forecasting and demand-response prototypes.</li>
-          <li>Outage and work-order tables for field-service software.</li>
-          <li>Customer tables for tariff and affordability analysis.</li>
-        </ul>
-      </div>
-      <div class="use-group" id="use-logistics">
-        <h4>Logistics and transportation</h4>
-        <ul>
-          <li>Shipments, routes and delivery events for testing tracking and planning systems.</li>
-          <li>Fleet and maintenance records for scheduling tools.</li>
-          <li>Trip and ridership tables for demand analysis.</li>
-        </ul>
-      </div>
-      <div class="use-group" id="use-government">
-        <h4>Government and public sector</h4>
-        <ul>
-          <li>Permits, inspections, licences and service requests for building citizen-facing systems.</li>
-          <li>Shareable versions of administrative tables for policy analysis and open-data previews.</li>
-          <li>Benefit and case-management tables for testing eligibility rules.</li>
-          <li>Procurement and spending tables for audit-tool development.</li>
-        </ul>
-      </div>
-      <div class="use-group" id="use-education">
-        <h4>Education and academic research</h4>
-        <ul>
-          <li>Teaching datasets for statistics, data science and econometrics courses.</li>
-          <li>Student-record tables for testing learning-management and reporting systems.</li>
-          <li>Companion data for publications when the original cannot be released.</li>
-          <li>Replication exercises: many datasets with the same known structure.</li>
-        </ul>
-      </div>
-      <div class="use-group" id="use-hr">
-        <h4>Human resources and workforce</h4>
-        <ul>
-          <li>Employee and payroll tables for testing HR and payroll software.</li>
-          <li>Hiring pipelines for analytics prototypes.</li>
-          <li>Workforce planning scenarios: change turnover or headcount mix and see the effect.</li>
-        </ul>
-      </div>
-      <div class="use-group" id="use-marketing">
-        <h4>Marketing, advertising and customer analytics</h4>
-        <ul>
-          <li>Campaign and event tables for building attribution and reporting tools.</li>
-          <li>Survey responses for testing analysis scripts before fieldwork ends.</li>
-          <li>Customer journeys for demo dashboards.</li>
-        </ul>
-      </div>
-      <div class="use-group" id="use-saas">
-        <h4>Software and SaaS</h4>
-        <ul>
-          <li>Seed data for product demos, trials and sandboxes.</li>
-          <li>Tenant-shaped test data for multi-customer platforms.</li>
-          <li>Usage and billing tables for metering tests.</li>
-        </ul>
-      </div>
-      <div class="use-group" id="use-security">
-        <h4>Cybersecurity and IT operations</h4>
-        <ul>
-          <li>Log and event tables for testing detection rules and dashboards.</li>
-          <li>Asset and access inventories for training exercises.</li>
-          <li>Incident tickets for tooling and reporting prototypes.</li>
-        </ul>
-      </div>
-      <div class="use-group" id="use-realestate">
-        <h4>Real estate and construction</h4>
-        <ul>
-          <li>Listings, permits and inspections for market-analysis tools.</li>
-          <li>Project cost and schedule tables for estimating software.</li>
-          <li>Contractor and bid tables for procurement systems.</li>
-        </ul>
-      </div>
-      <div class="use-group" id="use-nonprofit">
-        <h4>Nonprofits and international development</h4>
-        <ul>
-          <li>Beneficiary and programme tables for building case-management tools.</li>
-          <li>Survey microdata for training analysts.</li>
-          <li>Donor and grant tables for reporting systems.</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <div class="uses-part uses-job" id="uses-job" data-part="job">
-    <h3 class="uses-part-title">By the job to be done</h3>
-    <ul class="uses-index" aria-label="Jobs to be done">
-      <li><a href="#use-build" aria-controls="use-build">Build and test software</a></li>
-      <li><a href="#use-models" aria-controls="use-models">Develop analytics and models</a></li>
-      <li><a href="#use-share" aria-controls="use-share">Share data across a boundary</a></li>
-      <li><a href="#use-change" aria-controls="use-change">Watch for change</a></li>
-      <li><a href="#use-whatif" aria-controls="use-whatif">Explore what could happen</a></li>
-      <li><a href="#use-teach" aria-controls="use-teach">Teach, demonstrate and sell</a></li>
-    </ul>
-    <div class="uses-groups">
-      <div class="use-group" id="use-build">
-        <h4>Build and test software</h4>
-        <ul>
-          <li><b>Realistic test databases.</b> Fill a development or staging database with rows that have the shapes, ranges, empty cells and odd cases of production, without copying production.</li>
-          <li><b>Load and performance tests.</b> Generate ten or a thousand times your current volume to see where queries, pipelines and dashboards slow down.</li>
-          <li><b>Migration rehearsals.</b> Run a schema change or a platform move against lifelike data before touching the real thing.</li>
-          <li><b>Reproducible bug reports.</b> Share a table that triggers the problem instead of a customer’s data.</li>
-          <li><b>Continuous integration.</b> Keep a small fingerprint file in the repository and generate fresh test data on every run. The same seed gives the same rows.</li>
-        </ul>
-      </div>
-      <div class="use-group" id="use-models">
-        <h4>Develop analytics and models</h4>
-        <ul>
-          <li><b>Prototype before access is granted.</b> Start building features, queries and dashboards while the request for the real data is still in review.</li>
-          <li><b>Share a working sample</b> with a contractor or vendor so they can build against the right structure.</li>
-          <li><b>Notebook and tutorial data.</b> Publish examples that run for everyone, on data that looks like the real problem.</li>
-          <li><b>Benchmark methods fairly.</b> Generate many independent datasets from the same fingerprint to see how stable a method is.</li>
-        </ul>
-      </div>
-      <div class="use-group" id="use-share">
-        <h4>Share data across a boundary</h4>
-        <ul>
-          <li><b>Between teams</b> that are not all cleared for the raw records.</li>
-          <li><b>With partners, auditors or regulators</b> who need to understand the data’s structure.</li>
-          <li><b>With researchers and students,</b> as a companion to a paper or a course.</li>
-          <li><b>Across regions</b> where the raw records must stay where they are. The fingerprint is a small file of statistics, not rows.</li>
-        </ul>
-      </div>
-      <div class="use-group" id="use-change">
-        <h4>Watch for change</h4>
-        <ul>
-          <li><b>Drift detection.</b> Compare this month’s fingerprint with last month’s to see which columns and relationships moved, without storing or re-reading either month’s rows.</li>
-          <li><b>Pipeline checks.</b> Fail a build when an upstream feed changes shape.</li>
-          <li><b>Vendor data acceptance.</b> Check a new delivery against the fingerprint of the last good one.</li>
-        </ul>
-      </div>
-      <div class="use-group" id="use-whatif">
-        <h4>Explore what could happen</h4>
-        <ul>
-          <li><b>What-if scenarios.</b> Shift an average, widen a spread, strengthen a relationship or mix two populations, then generate data for that world. You can also describe the change in plain English: a model drafts the request for you to review, and nothing runs until you apply it (the optional <code>ectype-data[llm]</code> extra; a simple offline drafter is built in).</li>
-          <li><b>Stress cases.</b> Produce more of the rare situations a system must survive.</li>
-          <li><b>Planning for a launch.</b> Describe a table that does not exist yet from a specification and generate data for it, so work can start before the first real record arrives.</li>
-        </ul>
-      </div>
-      <div class="use-group" id="use-teach">
-        <h4>Teach, demonstrate and sell</h4>
-        <ul>
-          <li><b>Product demos</b> with data that looks like the customer’s industry.</li>
-          <li><b>Training environments</b> for new staff, with no risk of exposing a real customer.</li>
-          <li><b>Classroom datasets</b> with realistic mess: missing values, skew, coded categories.</li>
-          <li><b>Hackathons and competitions</b> on data that can be handed out freely.</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <p class="uses-limits">Ectype works on tables. What it does not do is listed in <a data-site="usecases" href="https://github.com/EctypeHQ/ectype/blob/main/docs/use-cases.md">the docs</a>.</p>
+  <p class="uses-industries">From banking, insurance and healthcare to retail, energy, logistics, government and education.</p>
 </section>
 
 <!-- 6b. Works with AI agents: a recorded ectype-mcp session, replayed. The transcript(s), the
@@ -707,7 +446,7 @@ RESULT: <span class="pass">PASSED</span></code></pre>
   <div class="split-head">
     <h2 id="agents-title">Give your agent a data tool</h2>
     <div>
-      <p>An agent that needs a table usually improvises one from random numbers. With Ectype’s MCP server, coming next as a separate package, it describes the table once, in a short spec, and gets back rows whose rules hold on every row, a fingerprint for more, and a check of what came out against what was asked. It runs on your machine. Until it ships, an agent can call the library and the command line from its shell.</p>
+      <p>With Ectype’s MCP server, coming next as a separate package, an agent describes a table in a short spec and gets back checked rows. Until then, agents can call the library and command line.</p>
     </div>
   </div>
 
@@ -820,20 +559,8 @@ RESULT: <span class="pass">PASSED</span></code></pre>
       <ul class="agent-facts">
         <li>One call makes, saves and checks a table.</li>
         <li>Rules hold on every row.</li>
-        <li>Nothing leaves the machine: no port, no network, and files only in folders you name.</li>
+        <li>Nothing leaves the machine.</li>
       </ul>
-      <h3 class="tools-title">The seven tools</h3>
-      <dl class="tool-list">
-<!-- bake:mcp-tools -->
-<div><dt><code>create_table_from_spec</code></dt><dd>Makes a table from a short spec, saves its fingerprint and checks the rows against the spec.</dd></div>
-<div><dt><code>profile_table</code></dt><dd>Learns a fingerprint from a real table, with personal columns replaced.</dd></div>
-<div><dt><code>generate_rows</code></dt><dd>Writes any number of rows from a fingerprint.</dd></div>
-<div><dt><code>validate_rows</code></dt><dd>Checks a table against a fingerprint: structure, every rule on every row, sealed targets.</dd></div>
-<div><dt><code>compare_fingerprints</code></dt><dd>Reports drift between two fingerprints, without any data.</dd></div>
-<div><dt><code>describe_table</code></dt><dd>Describes a table&#x27;s columns and relationships without returning its values.</dd></div>
-<div><dt><code>inspect_fingerprint</code></dt><dd>Shows what a fingerprint holds, including the spec it was made from.</dd></div>
-<!-- /bake:mcp-tools -->
-      </dl>
     </div>
   </div>
 </section>
@@ -843,15 +570,14 @@ RESULT: <span class="pass">PASSED</span></code></pre>
   <div class="quick-inner">
     <div class="quick-head">
       <h2 id="qs-title">Take a print of your own table</h2>
-      <p>Python <span data-r="versions.python" data-f="or">3.11, 3.12 or 3.13</span>. The core depends on polars, numpy, scipy, pyarrow and pydantic.</p>
+      <p>Python <span data-r="versions.python" data-f="or">3.11, 3.12 or 3.13</span>.</p>
       <button class="pip pip-dark" type="button" data-copy="pip install ectype-data" aria-label="Copy the command pip install ectype-data">
         <code>pip install ectype-data</code><span class="pip-note" aria-hidden="true">copy</span>
       </button>
       <p class="status-note">Version <span data-r="versions.ectype">0.1.0</span>, <span data-r="tests.qualifier">more than</span> <span data-r="tests.count" data-f="int">2,600</span> automated tests, fingerprint format <span data-r="versions.format">0.4.0</span>.</p>
-      <p class="quick-links"><a data-site="github" href="https://github.com/EctypeHQ/ectype">Source on GitHub</a> <a data-site="pypi" href="https://pypi.org/project/ectype-data/">Package on PyPI</a> <a data-site="docs" href="https://github.com/EctypeHQ/ectype/blob/main/docs/guide/README.md">User guide</a></p>
+      <p class="quick-links"><a class="more" data-site="docs" href="https://github.com/EctypeHQ/ectype/blob/main/docs/guide/README.md">Read the guide</a> <a data-site="pypi" href="https://pypi.org/project/ectype-data/">Package on PyPI</a></p>
     </div>
     <div class="quick-code">
-      <p class="code-note">The package is published on PyPI as <code>ectype-data</code>. You import it as <code>ectype</code>, and the command is <code>ectype</code>.</p>
       <div class="code-block">
         <div class="code-bar"><span>In Python</span><button type="button" class="copy" data-copy-from="code-py" aria-label="Copy the Python example">Copy</button></div>
 <pre id="code-py" tabindex="0"><code><span class="c"># installed as ectype-data, imported as ectype</span>
@@ -883,7 +609,7 @@ ectype validate customers.dfp synthetic.parquet --html report.html</code></pre>
 
 <footer class="foot">
   <p>© 2026 ZeroPoint Holdings LLC. Ectype is a trademark of ZeroPoint Holdings LLC. Apache-2.0.</p>
-  <nav class="foot-links" aria-label="Project links"><a data-site="github" href="https://github.com/EctypeHQ/ectype">GitHub</a> <a data-site="pypi" href="https://pypi.org/project/ectype-data/">PyPI</a> <a data-site="docs" href="https://github.com/EctypeHQ/ectype/blob/main/docs/guide/README.md">Docs</a></nav>
+  <nav class="foot-links" aria-label="Project links"><a data-site="pypi" href="https://pypi.org/project/ectype-data/">PyPI</a> <a href="#top">Back to top</a></nav>
 </footer>
 </body>
 </html>

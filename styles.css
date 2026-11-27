@@ -300,7 +300,7 @@ html.js .cloud:not(.is-live):not(.is-static) .cloud-controls { visibility: hidde
 /* The loop diagram. .loop-stage is the seam for a later animated version: a fixed-ratio box that
    an enhancement can fill with an absolutely positioned .loop-anim, then hide the static SVG by
    adding .is-enhanced. Nothing outside the stage moves when that happens. */
-.flow { margin: 0 0 clamp(2rem, 4vw, 3rem); }
+.flow { margin: 0; }
 .loop-stage { position: relative; aspect-ratio: 1200 / 330; }
 .loop-stage > svg { display: block; width: 100%; height: 100%; overflow: visible; }
 .loop-stage > .loop-anim { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -329,19 +329,6 @@ html.js .cloud:not(.is-live):not(.is-static) .cloud-controls { visibility: hidde
 .flow .note { font-size: 14px; fill: var(--graphite); }
 .flow .seal-t { fill: var(--rose); font-weight: 600; }
 
-/* The four steps, numbered to match the diagram; four columns of the twelve. */
-.loop {
-  list-style: none; counter-reset: step; margin: 0; padding: 0;
-  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.5rem var(--cg);
-}
-.loop li { counter-increment: step; border-top: 2px solid var(--ninhydrin); padding-top: 0.8rem; }
-.loop h3 { font-size: 1.2rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.55rem; }
-.loop h3::before {
-  content: counter(step); flex: none; width: 1.55rem; height: 1.55rem; border-radius: 50%;
-  display: grid; place-items: center; background: var(--ninhydrin); color: #fff; font-size: 0.82rem; font-weight: 700;
-}
-.loop p { font-size: 0.97rem; margin: 0; }
-
 /* The session band: the die again, plain this time, carrying what the three commands print. */
 .run { position: relative; background: var(--die); color: var(--deep-text); }
 .run::before, .run::after {
@@ -364,7 +351,7 @@ html.js .cloud:not(.is-live):not(.is-static) .cloud-controls { visibility: hidde
 .run a:hover { color: #fff; }
 .run :focus-visible { outline-color: var(--on-dark-focus); }
 
-/* ---------- terminal (session band, report) ---------- */
+/* ---------- terminal (session band) ---------- */
 .term {
   background: var(--term); color: var(--term-text);
   border: 1px solid rgba(203,184,240,0.22); border-radius: 12px; overflow: hidden; min-width: 0;
@@ -415,36 +402,14 @@ html.js .cloud:not(.is-live):not(.is-static) .cloud-controls { visibility: hidde
   .term.will-play .blk::before { transform: none; }
   .term.is-played .blk::before, .term.is-played .out { animation: none; }
 }
-
-/* The annotated report under "Sealed evidence": terminal on columns 1–7, the key from 8. */
-.report {
-  margin: 0; padding: 0 0 2.25rem; border-bottom: 1.5px solid var(--rule);
-  display: grid; grid-template-columns: var(--cols); column-gap: var(--cg); row-gap: 1.25rem; align-items: start;
-}
-.report .term { grid-column: 1 / 8; }
-.report-notes { grid-column: 8 / 13; }
-.term-report .term-bar { display: block; font-family: var(--code); font-size: 0.84rem; color: var(--term-text); }
-.term-report .term-bar::before { content: "$ "; color: var(--aqua); font-weight: 700; }
-.term-report pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 0.82rem; padding-left: 1.3rem; }
+/* Numbered marks in the session's validate output, keyed beside it (.run-key). */
 .term .mk {
   display: inline-grid; place-items: center; width: 1.35rem; height: 1.35rem; margin-left: 0.7rem; vertical-align: 0.05em;
   border-radius: 50%; border: 1.5px solid var(--term-rose); color: var(--term-rose);
   font-family: var(--font); font-size: 0.72rem; font-weight: 700; line-height: 1;
 }
-.report-notes { list-style: none; counter-reset: note; margin: 0; padding: 0; display: grid; gap: 0.9rem; }
-.report-notes li { counter-increment: note; position: relative; padding-left: 2.2rem; font-size: 0.95rem; line-height: 1.45; }
-.report-notes li::before {
-  content: counter(note); position: absolute; left: 0; top: 0; width: 1.4rem; height: 1.4rem; border-radius: 50%; border: 1.5px solid var(--rose); color: var(--rose);
-  display: grid; place-items: center; font-size: 0.75rem; font-weight: 700; margin-top: 0.05rem;
-}
-.report-notes b { font-weight: 680; }
-.report-notes code { background: var(--paper); }
-.report figcaption { grid-column: 1 / -1; font-size: 0.92rem; color: var(--graphite); max-width: 92ch; }
-.report figcaption code { background: var(--paper); padding: 0.05em 0.3em; border-radius: 3px; }
 
-/* ---------- 6. uses: an index and one open group ----------
-   Without JavaScript: both views as plain grouped lists, each with an index of jump links.
-   With uses.js (.is-ready): a switch between views; the index on the left, one group open. */
+/* ---------- 6. uses: six jobs on the differentiators' list ---------- */
 .evidence, .uses, .agents, .results-rest { max-width: var(--max); margin: 0 auto; padding: var(--section) var(--gutter) 0; }
 .results { position: relative; }
 /* A ridge rule opens each calm section. */
@@ -453,55 +418,7 @@ html.js .cloud:not(.is-live):not(.is-static) .cloud-controls { visibility: hidde
   background: url("img/ridges/rule.svg") left center / auto 22px repeat-x;
 }
 
-/* .uses-switch is also a .switch (margin: 0, declared later): raise specificity so the gap holds. */
-.uses .uses-switch { margin-bottom: clamp(1.75rem, 3vw, 2.5rem); } /* clear of the purple rule below */
-.uses:not(.is-ready) .uses-switch { display: none; }
-.uses-part { border-top: 2px solid var(--ninhydrin); padding-top: 1rem; margin-bottom: 2.5rem; }
-.uses-part-title { font-size: 1.3rem; font-stretch: 112%; margin-bottom: 0.75rem; }
-.uses-index { list-style: none; margin: 0 0 1.5rem; padding: 0; display: flex; flex-wrap: wrap; gap: 0.1rem 1.25rem; }
-.uses-index a { display: inline-block; padding: 0.35rem 0; font-weight: 500; }
-.uses-groups { columns: 3 18rem; column-gap: clamp(2rem, 4vw, 3.5rem); }
-.use-group { break-inside: avoid; padding-bottom: 1.5rem; }
-.use-group h4 { font-size: 1.05rem; font-stretch: 108%; font-weight: 650; margin: 0 0 0.4rem; }
-.use-group ul { list-style: none; margin: 0; padding: 0; }
-.use-group li { padding: 0.45rem 0; border-top: 1px solid var(--rule); font-size: 0.97rem; max-width: 64ch; }
-.use-group li b { font-weight: 650; }
-
-.uses.is-ready .uses-part {
-  display: grid; grid-template-columns: var(--cols); column-gap: var(--cg); row-gap: 1.5rem; align-items: start; padding-top: 0.5rem; margin-bottom: 0;
-}
-.uses.is-ready .uses-index { grid-column: 1 / 8; }
-.uses.is-ready .uses-groups { grid-column: 8 / 13; }
-.uses.is-ready .uses-part-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.uses.is-ready .uses-index { display: block; margin: 0; }
-.uses.is-ready .uses-industry .uses-index { columns: 2; column-gap: clamp(1.25rem, 3vw, 2.5rem); }
-.uses.is-ready .uses-index li { break-inside: avoid; border-bottom: 1px solid var(--rule); }
-.uses.is-ready .uses-index a {
-  position: relative; display: flex; align-items: center; min-height: 44px;
-  padding: 0.45rem 0 0.45rem 1.5rem; color: var(--ink); text-decoration: none; line-height: 1.3;
-}
-.uses.is-ready .uses-index a:hover { color: var(--ninhydrin); text-decoration: underline; }
-.uses.is-ready .uses-index a::before {
-  content: ""; position: absolute; left: 0.2rem; top: 50%; width: 0.4rem; height: 0.4rem; margin-top: -0.2rem;
-  border-radius: 50%; background: var(--rule);
-}
-.uses.is-ready .uses-index a[aria-current] { color: var(--ninhydrin); font-weight: 680; font-stretch: 112%; }
-.uses.is-ready .uses-index a[aria-current]::before {
-  left: 0; width: 0.8rem; height: 0.8rem; margin-top: -0.4rem;
-  background: none; border: 2px solid var(--rose);
-}
-.uses.is-ready .uses-groups { columns: auto; padding-top: 0.4rem; }
-.uses.is-ready .use-group { padding: 0; }
-.uses.is-ready .use-group h4 {
-  font-size: clamp(1.5rem, 2.4vw, 2rem); font-stretch: 118%; font-weight: 620; line-height: 1.1;
-  letter-spacing: -0.01em; color: var(--ninhydrin); margin-bottom: 1rem;
-}
-.uses.is-ready .use-group li { padding: 0.75rem 0; font-size: 1.05rem; }
-.uses.is-ready .use-group li:last-child { border-bottom: 1px solid var(--rule); }
-.uses.is-ready .uses-job .use-group li b { display: block; }
-
-.uses { padding-bottom: var(--section); }
-.uses-limits { margin: clamp(2rem, 4vw, 3rem) 0 0; padding-top: 1.25rem; border-top: 1.5px solid var(--rule); max-width: none; }
+.uses-industries { margin: clamp(1.5rem, 3vw, 2.25rem) 0 0; color: var(--graphite); max-width: 80ch; }
 
 /* ---------- 4. evidence: Fig. 3 ---------- */
 
@@ -593,7 +510,7 @@ html.js .cloud:not(.is-live):not(.is-static) .cloud-controls { visibility: hidde
 .cast p, .cast .split-head p { color: var(--cast-soft); }
 .cast a { color: #fff; }
 .cast .fig-no { color: #fff; }
-.results-rest { padding-top: calc(var(--section) + var(--edge)); padding-bottom: var(--section); }
+.results-rest { padding-top: calc(var(--section) + var(--edge)); padding-bottom: 0; }
 .measured { font-weight: 600; color: #fff !important; }
 
 /* The four headline results: very large condensed numerals, like a gauge stamped in metal. */
@@ -688,7 +605,7 @@ html.js .cloud:not(.is-live):not(.is-static) .cloud-controls { visibility: hidde
 .h2h-table tr.is-ref th, .h2h-table tr.is-ref td { color: var(--graphite); border-bottom: 0; }
 .h2h-table tr.is-ref th { font-weight: 500; }
 .h2h-table tr:not(.is-ref) + tr.is-ref th, .h2h-table tr:not(.is-ref) + tr.is-ref td { border-top: 1px solid var(--ink); padding-top: 0.85rem; }
-.source { font-size: 0.92rem; color: var(--ink); margin-top: 1.25rem; max-width: none; }
+.source { font-size: 0.95rem; color: var(--graphite); margin-top: 1.5rem; max-width: none; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 1rem; }
 
 /* ---------- 5. differentiators ----------
    No icons: typography and the grid carry the section (see CLOUD.md, "Feature marks"). The two
@@ -700,8 +617,7 @@ html.js .cloud:not(.is-live):not(.is-static) .cloud-controls { visibility: hidde
   display: grid; grid-template-columns: var(--cols); column-gap: var(--cg); row-gap: 0.75rem; align-items: start;
   padding: 2rem 0; border-top: 2px solid var(--ninhydrin); border-bottom: 1.5px solid var(--rule);
 }
-.mark-lead + .mark-lead, .report + .mark-lead { border-top: 0; }
-.mark-lead:has(+ .report) { border-bottom: 0; }
+.mark-lead + .mark-lead { border-top: 0; }
 .mark-lead h3 { grid-column: 1 / 5; font-size: clamp(1.5rem, 2.4vw, 2rem); font-stretch: 118%; line-height: 1.12; color: var(--ninhydrin); margin: 0; }
 .mark-lead p { grid-column: 5 / 13; font-size: 1.1rem; max-width: 72ch; margin: 0; }
 .mark-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 clamp(1.5rem, 3vw, 3rem); }
@@ -724,8 +640,7 @@ html.js .cloud:not(.is-live):not(.is-static) .cloud-controls { visibility: hidde
 .pip-dark .pip-note { background: rgba(38,16,63,0.12); }
 .pip-dark.copied .pip-note { background: var(--deep); color: #fff; }
 .status-note { font-size: 0.92rem; }
-.code-note { font-size: 0.95rem; margin: 0 0 -0.6rem; max-width: none; }
-.quick-links { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; }
+.quick-links { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 1.5rem; }
 .quick a { color: var(--lilac); }
 .quick a:hover { color: #fff; }
 .quick-code { display: grid; gap: 1.25rem; min-width: 0; }
@@ -752,20 +667,18 @@ html.js .cloud:not(.is-live):not(.is-static) .cloud-controls { visibility: hidde
   .hero-side .lede { grid-column: 1 / 7; grid-row: 1 / 4; margin: 0; }
   .hero-side .install, .hero-side .proof, .hero-side .fine { grid-column: 7 / 13; }
   .hero .plate { grid-column: 1 / -1; }
-  .run-cap, .run .term, .report .term, .report-notes { grid-column: 1 / -1; }
+  .run-cap, .run .term { grid-column: 1 / -1; }
   .run-cap { max-width: 68ch; }
   .h2h-stats div:nth-child(3) { border-left: 0; padding-left: 0; }
   .spec-body { grid-template-columns: minmax(0, 1fr); grid-template-areas: "mats" "side" "hists"; }
   .spec-side { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; gap: 1rem 2rem; }
   .spec-side .notes { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.85rem 2rem; }
   .mark-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .loop { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 2rem; }
   .h2h-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 1.25rem; }
   .hists { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 820px) {
-  .split-head > *, .hero-side > *, .quick-head, .quick-code, .h2h-notes p, .anatomy dt, .anatomy dd,
-  .uses.is-ready .uses-index, .uses.is-ready .uses-groups { grid-column: 1 / -1 !important; }
+  .split-head > *, .hero-side > *, .quick-head, .quick-code, .h2h-notes p, .anatomy dt, .anatomy dd { grid-column: 1 / -1 !important; }
   .hero-side .lede { grid-row: auto; margin-bottom: 1.25rem; }
   .anatomy dd { padding-left: 1.6rem; position: relative; }
   .anatomy dd::before { content: ""; position: absolute; left: 0.35rem; top: -0.25rem; bottom: -0.8rem; border-left: 1.5px solid var(--rule); }
@@ -808,15 +721,11 @@ html.js .cloud:not(.is-live):not(.is-static) .cloud-controls { visibility: hidde
   .h2h-stats div { flex-direction: row; justify-content: flex-start; align-items: center; gap: 1rem; padding: 1rem 0; border-left: 0; border-top: 1px solid rgba(195,228,223,0.28); }
   .h2h-stats div:first-child { border-top: 0; }
   .h2h-stats dd { flex: none; width: 9.5rem; font-size: 5rem; order: -1; }
-  .loop { grid-template-columns: minmax(0, 1fr); }
   .code-block pre { font-size: 0.78rem; }
   .term pre { font-size: 0.76rem; padding: 1rem 1rem 1.1rem 1.3rem; }
   .term .blk::before { left: -0.85rem; }
-  .term-report pre { font-size: 0.74rem; padding-left: 1rem; }
   .filewin-bar, .anatomy { padding-left: 1rem; padding-right: 1rem; }
   .sum-hint { font-size: 0.88rem; }
-  .uses.is-ready .uses-industry .uses-index { column-gap: 1rem; }
-  .uses.is-ready .uses-index a { font-size: 0.93rem; padding-left: 1.25rem; }
 }
 @media (max-width: 640px) {
   .hist svg text { font-size: 15px; }
@@ -927,7 +836,7 @@ html.js .cloud:not(.is-live):not(.is-static) .cloud-controls { visibility: hidde
 .session-replay.is-playing [data-step]:not(.is-shown) { visibility: hidden; opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .session-replay [data-step] { transition: none; } }
 
-/* the side column: status, three facts, the seven tools */
+/* the side column: status and three facts */
 .mcp-status { margin-bottom: 1.5rem; }
 .mcp-state { display: inline-flex; align-items: center; gap: 0.5rem; margin: 0 0 0.25rem; padding: 0.25rem 0.8rem; border-radius: 999px; font-size: 0.9rem; font-weight: 650; border: 1.5px solid var(--ninhydrin); color: var(--ninhydrin); }
 .mcp-state::before { content: ""; width: 8px; height: 8px; border-radius: 50%; border: 2px solid currentColor; }
@@ -940,19 +849,12 @@ html.js .cloud:not(.is-live):not(.is-static) .cloud-controls { visibility: hidde
 .agent-facts { list-style: none; margin: 0 0 2rem; padding: 0; }
 .agent-facts li { padding: 0.65rem 0; border-top: 1px solid var(--rule); font-weight: 600; }
 .agent-facts li:last-child { border-bottom: 1px solid var(--rule); }
-.tools-title { margin-bottom: 0.6rem; }
-.tool-list { margin: 0; }
-.tool-list div { padding: 0.5rem 0; border-bottom: 1px solid var(--hair); }
-.tool-list dt code { background: none; padding: 0; font-size: 0.86rem; font-weight: 650; color: var(--ninhydrin); overflow-wrap: anywhere; }
-.tool-list dd { margin: 0.1rem 0 0; font-size: 0.92rem; color: var(--graphite); }
 
 @media (max-width: 1100px) {
   .agents-demo, .agents-side { grid-column: 1 / -1; }
   .agents-side { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--cg); align-items: start; }
-  .mcp-status { grid-column: 1; grid-row: 1; }
-  .agent-facts { grid-column: 1; grid-row: 2; }
-  .tools-title { grid-column: 2; grid-row: 1; }
-  .tool-list { grid-column: 2; grid-row: 2 / span 2; }
+  .mcp-status { grid-column: 1; }
+  .agent-facts { grid-column: 2; }
 }
 @media (max-width: 640px) {
   .agents-side { display: block; }
@@ -972,3 +874,31 @@ html.js .cloud:not(.is-live):not(.is-static) .cloud-controls { visibility: hidde
   .checks td:nth-child(3)::before { content: "got "; color: var(--graphite); font-size: 0.78rem; }
   .vlist div { grid-template-columns: minmax(0, 1fr); gap: 0; }
 }
+
+/* ---------- lean copy (LEAN.md) ---------- */
+/* "Read more" links: the few places the page hands a reader to the public repository. */
+a.more { font-weight: 650; color: var(--ninhydrin); text-underline-offset: 0.18em; }
+a.more::after { content: " →"; }
+.quick a.more, .run a.more { color: #fff; }
+.more-line { margin: 0.75rem 0 0; }
+
+/* The validate key beside the session: numbered to the marks in the terminal. */
+.run-key { list-style: none; counter-reset: note; margin: 1.25rem 0; padding: 0; display: grid; gap: 0.7rem; }
+.run-key li { counter-increment: note; position: relative; padding-left: 2.1rem; font-size: 0.97rem; line-height: 1.45; color: var(--deep-text); }
+.run-key li::before {
+  content: counter(note); position: absolute; left: 0; top: 0.05rem; width: 1.35rem; height: 1.35rem; border-radius: 50%;
+  border: 1.5px solid var(--term-rose); color: var(--term-rose); display: grid; place-items: center; font-size: 0.72rem; font-weight: 700;
+}
+.run-key b { font-weight: 680; color: #fff; }
+
+/* Four short differentiators in one row under the lead. */
+.mark-list.mark-four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.mark-list li > p + p { margin-top: 0.5rem; }
+@media (max-width: 1080px) { .mark-list.mark-four { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .mark-list.mark-four { grid-template-columns: minmax(0, 1fr); } }
+.uses-list h3 { font-size: 1.2rem; }
+@media (max-width: 640px) { .uses-list li { padding: 1.1rem 0 0.9rem; } }
+
+.mark-list code { white-space: nowrap; }
+/* Phones: the session wraps, so the three marks its key refers to stay in view. */
+@media (max-width: 640px) { .run .term pre { white-space: pre-wrap; overflow-wrap: anywhere; } }

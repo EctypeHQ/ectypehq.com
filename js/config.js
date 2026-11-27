@@ -7,4 +7,5 @@ export const SITE = {
   benchmarks: "https://github.com/EctypeHQ/ectype/blob/main/docs/results/benchmarks.md",
   compete: "https://github.com/EctypeHQ/ectype/blob/main/docs/results/compete.md",
   usecases: "https://github.com/EctypeHQ/ectype/blob/main/docs/use-cases.md",
+  privacy: "https://github.com/EctypeHQ/ectype/blob/main/docs/guide/12-privacy.md",
 };

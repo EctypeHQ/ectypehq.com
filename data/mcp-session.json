@@ -1,0 +1,467 @@
+{
+ "$comment": "Built by tools/update_data.py from the recordings in shared/ named in data/mcp.json, and shared/mcp-tools.json. Do not edit.",
+ "tools": [
+  {
+   "name": "create_table_from_spec",
+   "title": "Create a table from a spec",
+   "line": "Makes a table from a short spec, saves its fingerprint and checks the rows against the spec."
+  },
+  {
+   "name": "profile_table",
+   "title": "Learn a fingerprint from a table",
+   "line": "Learns a fingerprint from a real table, with personal columns replaced."
+  },
+  {
+   "name": "generate_rows",
+   "title": "Generate rows from a fingerprint",
+   "line": "Writes any number of rows from a fingerprint."
+  },
+  {
+   "name": "validate_rows",
+   "title": "Validate rows against a fingerprint",
+   "line": "Checks a table against a fingerprint: structure, every rule on every row, sealed targets."
+  },
+  {
+   "name": "compare_fingerprints",
+   "title": "Compare two fingerprints",
+   "line": "Reports drift between two fingerprints, without any data."
+  },
+  {
+   "name": "describe_table",
+   "title": "Describe a table",
+   "line": "Describes a table's columns and relationships without returning its values."
+  },
+  {
+   "name": "inspect_fingerprint",
+   "title": "Inspect a fingerprint",
+   "line": "Shows what a fingerprint holds, including the spec it was made from."
+  }
+ ],
+ "sessions": [
+  {
+   "recorded": "2026-11-26",
+   "server": "ectype-mcp 0.1.0",
+   "engine": "",
+   "client": "Claude Code 2.1.332",
+   "recorded_in": "Claude Code",
+   "files": {},
+   "steps": [
+    {
+     "tool": "create_table_from_spec",
+     "arguments": {
+      "output_path": "gym-members.csv",
+      "rows": 2000,
+      "spec": {
+       "name": "gym_members",
+       "columns": [
+        {
+         "name": "member_id",
+         "type": "identifier",
+         "kind": "int_sequence"
+        },
+        {
+         "name": "plan",
+         "type": "categorical",
+         "probs": {
+          "basic": 0.6,
+          "plus": 0.3,
+          "premium": 0.1
+         }
+        },
+        {
+         "name": "join_date",
+         "type": "datetime",
+         "start": "2025-01-01",
+         "end": "2025-12-31"
+        },
+        {
+         "name": "monthly_visits",
+         "type": "numeric",
+         "dist": "negbinom",
+         "mean": 8,
+         "r": 4
+        }
+       ],
+       "derived": {
+        "monthly_fee": {
+         "expression": "lookup(plan, 'basic', 25, 'plus', 45, 'premium', 80)",
+         "dtype": "Int64"
+        }
+       }
+      }
+     },
+     "result": {
+      "summary": "Wrote 2,000 rows to gym-members.csv and the fingerprint to gym-members.dfp. All 4 checks match the spec. Validation passed.",
+      "spec_status": "matches",
+      "output_path": "gym-members.csv",
+      "fingerprint_path": "gym-members.dfp",
+      "rows": 2000,
+      "seed": 0,
+      "columns_omitted": 0,
+      "validation": {
+       "passed": true,
+       "rows": 2000,
+       "structure": "5/5 checks ok",
+       "rules": "0/0 hard rules hold on every row",
+       "sealed": "8/9 targets passed; 0 failed beyond sampling noise",
+       "calibration": "12/12 targets passed (optimizer evidence only)",
+       "holdout": null,
+       "failure_reasons": [],
+       "worst_targets": [
+        "univariate.granularity:monthly_visits d/tol=1.43 (sealed)"
+       ]
+      },
+      "checks": [
+       {
+        "item": "member_id",
+        "asked": "unique int_sequence",
+        "got": "2000 unique of 2000",
+        "ok": true,
+        "by_rules": false
+       },
+       {
+        "item": "plan",
+        "asked": "basic 0.6, plus 0.3, premium 0.1",
+        "got": "basic 0.601, plus 0.308, premium 0.091",
+        "ok": true,
+        "by_rules": false
+       },
+       {
+        "item": "join_date",
+        "asked": "spread evenly 2025-01-01 to 2025-12-31",
+        "got": "2025-01-02 to 2025-12-31, median 2025-07-04",
+        "ok": true,
+        "by_rules": false
+       },
+       {
+        "item": "monthly_visits",
+        "asked": "negbinom mean 8, sd 4.9",
+        "got": "mean 7.98, sd 4.8",
+        "ok": true,
+        "by_rules": false
+       }
+      ],
+      "checks_omitted": 0
+     }
+    }
+   ],
+   "derived": {
+    "$comment": "Computed by tools/update_data.py. Do not edit.",
+    "rules_held": 0,
+    "rules_total": 0,
+    "sealed_passed": 8,
+    "sealed_total": 9,
+    "spec_columns": 4,
+    "spec_rules": 0,
+    "spec_derived": 1,
+    "spec_correlations": 0,
+    "checks": 4
+   }
+  },
+  {
+   "recorded": "2026-11-26",
+   "server": "ectype-mcp 0.1.0",
+   "engine": "ectype-data 0.1.0",
+   "client": "",
+   "recorded_in": "MCP SDK client",
+   "files": {
+    "orders.parquet": 606836,
+    "orders.dfp": 9681,
+    "orders-big.parquet": 5671363
+   },
+   "steps": [
+    {
+     "tool": "create_table_from_spec",
+     "arguments": {
+      "output_path": "orders.parquet",
+      "rows": 50000,
+      "seed": 42,
+      "spec": {
+       "name": "orders",
+       "columns": [
+        {
+         "name": "order_id",
+         "type": "identifier",
+         "kind": "int_sequence"
+        },
+        {
+         "name": "customer_id",
+         "type": "numeric",
+         "dist": "uniform",
+         "lo": 0.5,
+         "hi": 5000.5,
+         "decimals": 0,
+         "dtype": "Int64"
+        },
+        {
+         "name": "order_date",
+         "type": "datetime",
+         "start": "2024-01-01",
+         "end": "2024-12-31"
+        },
+        {
+         "name": "ship_date",
+         "type": "datetime",
+         "start": "2024-01-02",
+         "end": "2025-01-07"
+        },
+        {
+         "name": "quantity",
+         "type": "numeric",
+         "dist": "negbinom",
+         "mean": 1.5,
+         "r": 3,
+         "shift": 1
+        },
+        {
+         "name": "unit_price",
+         "type": "numeric",
+         "dist": "lognormal",
+         "mu": 3.4,
+         "sigma": 0.6,
+         "decimals": 2
+        },
+        {
+         "name": "channel",
+         "type": "categorical",
+         "probs": {
+          "web": 0.7,
+          "store": 0.3
+         }
+        },
+        {
+         "name": "returned",
+         "type": "boolean",
+         "p": 0.03
+        }
+       ],
+       "derived": {
+        "total": "round(quantity * unit_price, 2)"
+       },
+       "constraints": [
+        "date_diff_days(ship_date, order_date) >= 1",
+        "date_diff_days(ship_date, order_date) <= 7"
+       ],
+       "correlations": [
+        {
+         "columns": [
+          "quantity",
+          "unit_price"
+         ],
+         "rho": -0.3
+        }
+       ]
+      }
+     },
+     "result": {
+      "summary": "Wrote 50,000 rows to orders.parquet and the fingerprint to orders.dfp. All 9 checks match the spec. Validation passed.",
+      "spec_status": "matches",
+      "output_path": "orders.parquet",
+      "fingerprint_path": "orders.dfp",
+      "rows": 50000,
+      "seed": 42,
+      "columns_omitted": 0,
+      "validation": {
+       "passed": true,
+       "rows": 50000,
+       "structure": "5/5 checks ok",
+       "rules": "2/2 hard rules hold on every row",
+       "sealed": "40/40 targets passed; 0 failed beyond sampling noise",
+       "calibration": "43/43 targets passed (optimizer evidence only)",
+       "holdout": null,
+       "failure_reasons": [],
+       "worst_targets": []
+      },
+      "checks": [
+       {
+        "item": "order_id",
+        "asked": "unique int_sequence",
+        "got": "50000 unique of 50000",
+        "ok": true,
+        "by_rules": false
+       },
+       {
+        "item": "customer_id",
+        "asked": "uniform 0.5 to 5000.5",
+        "got": "1 to 5000, mean 2506.1",
+        "ok": true,
+        "by_rules": false
+       },
+       {
+        "item": "order_date",
+        "asked": "spread evenly 2024-01-01 to 2024-12-31",
+        "got": "2024-01-01 to 2024-12-31, median 2024-07-01",
+        "ok": true,
+        "by_rules": true
+       },
+       {
+        "item": "ship_date",
+        "asked": "spread evenly 2024-01-02 to 2025-01-07",
+        "got": "2024-01-03 to 2025-01-07, median 2024-07-05",
+        "ok": true,
+        "by_rules": true
+       },
+       {
+        "item": "quantity",
+        "asked": "negbinom mean 2.5, sd 1.5",
+        "got": "mean 2.49, sd 1.49",
+        "ok": true,
+        "by_rules": false
+       },
+       {
+        "item": "unit_price",
+        "asked": "lognormal median 29.96",
+        "got": "median 30.14, mean 35.96",
+        "ok": true,
+        "by_rules": false
+       },
+       {
+        "item": "channel",
+        "asked": "web 0.7, store 0.3",
+        "got": "web 0.697, store 0.303",
+        "ok": true,
+        "by_rules": false
+       },
+       {
+        "item": "returned",
+        "asked": "share true 0.03",
+        "got": "0.0315",
+        "ok": true,
+        "by_rules": false
+       },
+       {
+        "item": "quantity ~ unit_price",
+        "asked": "rank correlation -0.3",
+        "got": "rank correlation -0.285",
+        "ok": true,
+        "by_rules": false
+       }
+      ],
+      "checks_omitted": 0
+     }
+    },
+    {
+     "tool": "generate_rows",
+     "arguments": {
+      "fingerprint_path": "orders.dfp",
+      "output_path": "orders-big.parquet",
+      "rows": 500000,
+      "seed": 1
+     },
+     "result": {
+      "summary": "Wrote 500,000 rows to orders-big.parquet. All 9 checks match the spec.",
+      "spec_status": "matches",
+      "output_path": "orders-big.parquet",
+      "fingerprint_path": "orders.dfp",
+      "origin": "authored",
+      "rows": 500000,
+      "seed": 1,
+      "columns_omitted": 0,
+      "checks": [
+       {
+        "item": "order_id",
+        "asked": "unique int_sequence",
+        "got": "500000 unique of 500000",
+        "ok": true,
+        "by_rules": false
+       },
+       {
+        "item": "customer_id",
+        "asked": "uniform 0.5 to 5000.5",
+        "got": "1 to 5000, mean 2498.7",
+        "ok": true,
+        "by_rules": false
+       },
+       {
+        "item": "order_date",
+        "asked": "spread evenly 2024-01-01 to 2024-12-31",
+        "got": "2024-01-01 to 2024-12-31, median 2024-07-02",
+        "ok": true,
+        "by_rules": true
+       },
+       {
+        "item": "ship_date",
+        "asked": "spread evenly 2024-01-02 to 2025-01-07",
+        "got": "2024-01-02 to 2025-01-07, median 2024-07-06",
+        "ok": true,
+        "by_rules": true
+       },
+       {
+        "item": "quantity",
+        "asked": "negbinom mean 2.5, sd 1.5",
+        "got": "mean 2.5, sd 1.5",
+        "ok": true,
+        "by_rules": false
+       },
+       {
+        "item": "unit_price",
+        "asked": "lognormal median 29.96",
+        "got": "median 29.89, mean 35.84",
+        "ok": true,
+        "by_rules": false
+       },
+       {
+        "item": "channel",
+        "asked": "store 0.3, web 0.7",
+        "got": "store 0.3, web 0.7",
+        "ok": true,
+        "by_rules": false
+       },
+       {
+        "item": "returned",
+        "asked": "share true 0.03",
+        "got": "0.0299",
+        "ok": true,
+        "by_rules": false
+       },
+       {
+        "item": "quantity ~ unit_price",
+        "asked": "rank correlation -0.3",
+        "got": "rank correlation -0.288",
+        "ok": true,
+        "by_rules": false
+       }
+      ],
+      "checks_omitted": 0
+     }
+    },
+    {
+     "tool": "validate_rows",
+     "arguments": {
+      "fingerprint_path": "orders.dfp",
+      "table_path": "orders-big.parquet"
+     },
+     "result": {
+      "fingerprint_path": "orders.dfp",
+      "table_path": "orders-big.parquet",
+      "holdout_path": null,
+      "validation": {
+       "passed": true,
+       "rows": 500000,
+       "structure": "5/5 checks ok",
+       "rules": "2/2 hard rules hold on every row",
+       "sealed": "40/40 targets passed; 0 failed beyond sampling noise",
+       "calibration": "43/43 targets passed (optimizer evidence only)",
+       "holdout": null,
+       "failure_reasons": [],
+       "worst_targets": []
+      }
+     }
+    }
+   ],
+   "derived": {
+    "$comment": "Computed by tools/update_data.py. Do not edit.",
+    "rules_held": 2,
+    "rules_total": 2,
+    "sealed_passed": 40,
+    "sealed_total": 40,
+    "spec_columns": 8,
+    "spec_rules": 2,
+    "spec_derived": 1,
+    "spec_correlations": 1,
+    "pct_returned": 3,
+    "checks": 9
+   }
+  }
+ ]
+}

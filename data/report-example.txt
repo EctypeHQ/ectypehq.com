@@ -1,0 +1,34 @@
+$ ectype --version
+ectype 0.1.0 (format 0.4.0)
+[exit 0]
+
+$ ectype profile beijing-2013.parquet -o beijing-2013.dfp --name "Beijing air quality, 2013"
+wrote beijing-2013.dfp
+  8760 rows x 12 columns, policy=standard, targets=97 calibration + 127 sealed
+  joint model: chain_copula (effort="balanced", the default)
+  4 suggested constraints (review with: ectype constraints beijing-2013.dfp --list)
+[exit 0]
+
+$ ectype profile beijing-2014.parquet -o beijing-2014.dfp --name "Beijing air quality, 2014"
+wrote beijing-2014.dfp
+  8760 rows x 12 columns, policy=standard, targets=115 calibration + 147 sealed
+  joint model: chain_copula (effort="balanced", the default)
+  6 suggested constraints (review with: ectype constraints beijing-2014.dfp --list)
+[exit 0]
+
+$ ectype report beijing-2013.dfp
+Beijing air quality, 2013: 8,760 rows x 12 columns
+Policy standard, format 0.4.0
+Columns: 10 modeled, 1 modeled as a gap, 1 constant
+Structure: 1 ordering
+Alerts: 0 worth acting on, 4 notes
+wrote beijing-2013-report.html (94 KB, 12 columns, full detail)
+[exit 0]
+
+$ ectype report beijing-2013.dfp beijing-2014.dfp
+Beijing air quality, 2013 compared with Beijing air quality, 2014
+Drift found: 24 of 224 measured properties moved by more than sampling noise explains.
+Columns: 3 drifted, 9 steady
+Most changed: TEMP, PRES and DEWP
+wrote beijing-2013-vs-beijing-2014-report.html (47 KB, comparison of two fingerprints)
+[exit 0]

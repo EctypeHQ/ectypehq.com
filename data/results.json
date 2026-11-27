@@ -1,0 +1,37 @@
+{
+  "$comment": "Facts quoted on the site that are not in the head-to-head summary. The head-to-head numbers live in data/compete.json, built by tools/update_data.py from shared/compete-summary.json. Field reference: tools/update_data.py.",
+  "versions": {
+    "ectype": "0.1.0",
+    "format": "0.4.0",
+    "python": ["3.11", "3.12", "3.13"]
+  },
+  "tests": {
+    "count": 2600,
+    "qualifier": "more than"
+  },
+  "validation": {
+    "fdr_q": 0.05
+  },
+  "claims": {
+    "referential_integrity_pct": 100
+  },
+  "report": {
+    "date": "2026-11-26",
+    "source": "docs/results/compete.md"
+  },
+  "robustness": {
+    "tables": 29,
+    "rows_min": 184,
+    "rows_max": 60000,
+    "columns_max": 287,
+    "failures": 0
+  },
+  "scale": {
+    "rows": 2400000,
+    "columns": 78
+  },
+  "pii": {
+    "table_rows": 2400000,
+    "rows_with_real_name_or_phone": 0
+  }
+}

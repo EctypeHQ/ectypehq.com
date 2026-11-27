@@ -1,0 +1,14 @@
+{
+ "$comment": "Written by tools/make_report_example.py from the commands' output (data/report-example.txt). Do not edit.",
+ "source": "UCI Beijing PM2.5, public, CC BY 4.0",
+ "engine": "0.1.0",
+ "format": "0.4.0",
+ "rows": 8760,
+ "columns": 12,
+ "drifted_columns": 3,
+ "steady_columns": 9,
+ "properties_drifted": 24,
+ "properties_measured": 224,
+ "page_bytes": 94517,
+ "comparison_bytes": 46790
+}

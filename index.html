@@ -3,27 +3,887 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; img-src 'self' data:; font-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
-<meta name="referrer" content="no-referrer">
-<title>Ectype</title>
-<meta name="description" content="Ectype learns a table's statistical fingerprint and generates rows that share it. Coming soon.">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="preload" href="/fonts/archivo-var.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/styles.css">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<title>Ectype: a statistical fingerprint for your tables</title>
+<meta name="description" content="Ectype is an open-source Python library and CLI. It learns a statistical fingerprint of a table, generates realistic synthetic rows from it, and measures how faithful they are on sealed evidence the generator never saw.">
+<link rel="canonical" href="https://ectypehq.com/">
+<meta name="theme-color" content="#2a0e47">
+<meta name="color-scheme" content="light">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Ectype">
+<meta property="og:url" content="https://ectypehq.com/">
+<meta property="og:title" content="Ectype: a statistical fingerprint for your tables">
+<meta property="og:description" content="Learn a table's fingerprint, generate rows that share it, and check them against sealed evidence. Open source, Apache-2.0, runs locally.">
+<meta property="og:image" content="https://ectypehq.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Two ridge prints drawn from rank correlations: real rows in purple, Ectype synthetic rows in teal.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Ectype: a statistical fingerprint for your tables">
+<meta name="twitter:description" content="Learn a table's fingerprint, generate rows that share it, and check them against sealed evidence. Open source, Apache-2.0, runs locally.">
+<meta name="twitter:image" content="https://ectypehq.com/og.png">
+<meta name="twitter:image:alt" content="Two ridge prints drawn from rank correlations: real rows in purple, Ectype synthetic rows in teal.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/archivo-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="styles.css">
+<script src="js/boot.js"></script>
+<script type="module" src="js/main.js"></script>
+<script type="module" src="js/uses.js"></script>
+<script type="module" src="js/agents.js"></script>
 </head>
 <body>
-<header class="top"><a class="wordmark" href="/" aria-label="Ectype"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M16 4c6.6 0 11 5 11 11.5S23 28 16 28"/><path d="M16 9c3.6 0 6 2.8 6 6.4S19.8 23 16 23 10 20 10 16.2"/><path d="M16 14c1.2 0 2 .9 2 2"/><path d="M5 13c1-4 3.8-7 7-8.4"/></g></svg>Ectype</a></header>
-<main>
-  <div class="words">
-    <h1>Learn a table&rsquo;s fingerprint. Generate rows that share it.</h1>
-    <p class="lead">Ectype is a synthetic-data engine for tables.</p>
-    <p class="soon">Coming soon</p>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="wordmark" href="#top" aria-label="Ectype, back to top">
+    <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M16 4c6.6 0 11 5 11 11.5S23 28 16 28"/><path d="M16 9c3.6 0 6 2.8 6 6.4S19.8 23 16 23 10 20 10 16.2"/><path d="M16 14c1.2 0 2 .9 2 2"/><path d="M5 13c1-4 3.8-7 7-8.4"/></g></svg>
+    Ectype
+  </a>
+  <nav aria-label="Primary">
+    <a href="#how">How it works</a>
+    <a href="#profile">Report</a>
+    <a href="#results">Results</a>
+    <a href="#evidence">Evidence</a>
+    <a href="#uses">Uses</a>
+    <a href="#agents">Agents</a>
+    <a href="#quickstart">Quickstart</a>
+    <a class="nav-gh" data-site="github" href="https://github.com/EctypeHQ/ectype">GitHub</a>
+  </nav>
+</header>
+
+<main id="main">
+
+<!-- 1. Hero: the original next to its ectype -->
+<section class="hero" id="top" aria-labelledby="hero-title">
+ <div class="hero-inner">
+    <h1 id="hero-title"><span class="h1-line">Learn a table’s fingerprint.</span> <span class="h1-line">Generate rows that share it.</span></h1>
+    <div class="hero-side">
+      <p class="lede">Ectype gives you realistic rows of your own table, as many as you need. It learns a small, readable <code>.dfp</code> fingerprint of how the table behaves, generates from that file alone, and checks the match against sealed evidence the generator never saw.</p>
+      <div class="install">
+        <button class="pip" type="button" data-copy="pip install ectype-data" aria-label="Copy the command pip install ectype-data">
+          <code>pip install ectype-data</code><span class="pip-note" aria-hidden="true">copy</span>
+        </button>
+        <a class="btn" data-site="github" href="https://github.com/EctypeHQ/ectype">View on GitHub</a>
+      </div>
+      <p class="proof">On <span data-r="compete.datasets" data-f="int">9</span> public datasets, its default model ranks <span data-r="compete.derived.default_rank" data-f="ordinal">2nd</span> of <span data-r="compete.derived.ranked_count" data-f="int">10</span> methods at passing for real data, ahead of every deep-learning model tested, with a median fit of <span data-r="compete.derived.by_id.ectype.fit_seconds_median" data-f="mean0">10</span> seconds on a CPU. <a href="#results">See the head-to-head</a>.</p>
+      <p class="fine">Open source under Apache-2.0. Runs on your machine. <a data-site="docs" href="https://github.com/EctypeHQ/ectype/blob/main/docs/guide/README.md">Read the guide</a>.</p>
+    </div>
+
+  <figure class="plate cloud" id="fig1" aria-labelledby="fig1-cap" data-view="side">
+    <!-- The stage is a fixed-ratio box. The poster below (img/cloud.svg, written by
+         tools/render_cloud.py from the same data and the same js/cloud-core.js) is the figure
+         until js/cloud.js has drawn its first WebGL frame, and stays the figure without
+         JavaScript or WebGL. The live canvas is laid over it, so nothing moves. -->
+    <div class="cloud-stage">
+      <img class="cloud-poster" src="img/cloud.svg" width="1000" height="625" alt="Two point clouds side by side on paper, each carrying a fingerprint of nested ridges traced from the density of its own points: a sample of real rows in purple on the left and of Ectype’s generated rows in teal on the right. The two prints match, and no teal point sits on a purple one.">
+      <p class="cloud-beat live" aria-hidden="true"></p>
+      <p class="cloud-legend" aria-hidden="true"><span class="lg lg-real">Real rows</span><span class="lg lg-ect">Ectype rows</span></p>
+      <div class="cloud-controls live">
+        <div class="views" role="group" aria-label="Show the two clouds">
+          <button type="button" data-view-btn="side" aria-pressed="true">Side by side</button>
+          <button type="button" data-view-btn="overlay" aria-pressed="false">Overlaid</button>
+        </div>
+        <button type="button" class="replay" data-replay>Replay</button>
+      </div>
+    </div>
+
+    <dl class="facts">
+      <div><dt>Real rows fitted</dt><dd data-r="cloud.rows_fitted" data-f="int">15,216</dd></div>
+      <div><dt>Rows generated</dt><dd data-count="generated" data-r="cloud.rows_generated" data-f="int">15,216</dd></div>
+      <div class="fact-zero"><dt>Generated rows identical to a real row</dt><dd data-r="cloud.synthetic_rows_identical_to_a_real_row" data-f="int">0</dd></div>
+    </dl>
+
+    <p id="cloud-desc" class="sr-only">Fig. 1 shows rows of a public table as points in three dimensions, one point per row and one axis per column: <span data-r="cloud.points_shown" data-f="int">4,000</span> real rows in purple and <span data-r="cloud.points_shown" data-f="int">4,000</span> rows generated by Ectype in teal. Nested ridges traced from the density of the real points form the cloud’s fingerprint; the generated rows, traced the same way, carry the same fingerprint. Ectype fitted <span data-r="cloud.rows_fitted" data-f="int">15,216</span> real rows and generated <span data-r="cloud.rows_generated" data-f="int">15,216</span>; <span data-r="cloud.synthetic_rows_identical_to_a_real_row" data-f="int">0</span> generated rows are identical to a real row.</p>
+
+    <figcaption id="fig1-cap">
+      <p class="cloud-say">Same shape. No row in common.</p>
+      <p class="cloud-src"><span class="fig-no">Fig. 1.</span> <span data-r="cloud.derived.columns_list">fLength, fSize and fConc</span> from <span data-r="cloud.source">MAGIC Gamma Telescope (UCI, public, CC BY 4.0): simulated air-shower images, training split of the benchmark</span>; <span data-r="cloud.points_shown" data-f="int">4,000</span> rows of each shown. <span data-r="cloud.derived.transform_note">fLength is drawn on a log scale, the same for both clouds.</span><span class="live"> Drag to turn.</span></p>
+    </figcaption>
+  </figure>
+ </div>
+</section>
+
+<!-- 2. What a fingerprint is, and the loop -->
+<section class="how" id="how" aria-labelledby="how-title">
+  <div class="how-inner">
+    <div class="split-head">
+      <h2 id="how-title">A fingerprint is a file you can read</h2>
+      <div>
+        <p>A <code>.dfp</code> file is JSON plus NumPy arrays plus checksums. It holds measurements and a model, never raw rows, so you can inspect it, diff it and keep it in version control.</p>
+        <p class="size-note">The fingerprint behind Fig. 3 is <strong data-r="demo.fingerprint_bytes" data-f="kb">335.8 kB</strong> for a <span data-r="demo.dataset.rows_train" data-f="int">24,000</span>-row table.</p>
+      </div>
+    </div>
+
+    <div class="filewin">
+      <p class="filewin-bar"><span class="filewin-name">customers.dfp</span><span class="filewin-kind">a ZIP archive: open it with any ZIP tool</span></p>
+      <dl class="anatomy" aria-label="What is inside a fingerprint file">
+        <div><dt><code>manifest.json</code><span>Manifest</span></dt><dd>JSON with a published JSON Schema: the disclosure policy, the columns and the format version.</dd></div>
+        <div><dt><code>arrays/&lt;name&gt;.npy</code><span>Model</span></dt><dd>A fitted model of every column, the dependence between them, missingness, constraints and relationships between tables.</dd></div>
+        <div><dt><code>targets/calibration.json</code><span>Calibration targets</span></dt><dd>Measurements of the source that the optimizer fits to. A pass confirms the fit; the sealed targets are the independent check.</dd></div>
+        <div class="sealed"><dt><code>targets/sealed.json</code><span>Sealed targets</span></dt><dd>Measurements hash-committed at fit time and kept from the optimizer. Only validation and drift comparison open them, and a tampered seal is detected.</dd></div>
+        <div><dt><code>checksums.sha256</code><span>Checksums</span></dt><dd>Every array is checked on load. Loading fails closed on tampered, oversized or malformed archives.</dd></div>
+      </dl>
+    </div>
+
+    <figure class="flow" id="loop" aria-labelledby="flow-cap">
+      <!-- Animation seam. .loop-stage is a fixed-ratio box (1200:330 wide, 340:700 below 820 px)
+           whose size never depends on what it holds. A later enhancement may append one element
+           with class "loop-anim" inside it (absolutely positioned over the whole stage) and add
+           "is-enhanced" to the stage, which hides the static SVGs. Without that class, or without
+           JavaScript, the SVGs below are the figure. The caption and the step list stay as they are. -->
+      <div class="loop-stage" data-enhance="loop">
+      <svg class="flow-wide" viewBox="0 0 1200 330" role="img" aria-labelledby="flow-cap" focusable="false">
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0L10 5L0 10z"/></marker>
+          <marker id="ah-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah-r" d="M0 0L10 5L0 10z"/></marker>
+        </defs>
+        <path class="edge" d="M206 82H332" marker-end="url(#ah)"/>
+        <path class="edge" d="M532 82H658" marker-end="url(#ah)"/>
+        <path class="edge" d="M858 82H984" marker-end="url(#ah)"/>
+        <path class="edge seal" d="M512 124V160H1086V130" marker-end="url(#ah-r)"/>
+        <path class="edge" d="M206 252H332" marker-end="url(#ah)"/>
+        <path class="edge" d="M532 252H658" marker-end="url(#ah)"/>
+        <path class="edge" d="M434 124V188H742V204" marker-end="url(#ah)"/>
+        <g class="step"><circle cx="226" cy="60" r="11"/><text class="step-n" x="226" y="65">1</text><text class="step-l" x="244" y="66">fit</text></g>
+        <g class="step"><circle cx="552" cy="60" r="11"/><text class="step-n" x="552" y="65">2</text><text class="step-l" x="570" y="66">generate</text></g>
+        <g class="step"><circle cx="878" cy="60" r="11"/><text class="step-n" x="878" y="65">3</text><text class="step-l" x="896" y="66">validate</text></g>
+        <g class="step"><circle cx="552" cy="230" r="11"/><text class="step-n" x="552" y="235">4</text><text class="step-l" x="570" y="236">compare</text></g>
+        <text class="step-l dim" x="226" y="236">fit</text>
+        <text class="note seal-t" x="800" y="151" text-anchor="middle">sealed targets, opened only to check</text>
+        <g class="node orig"><path d="M10 40H190L206 56V124H10Z"/><path class="fold" d="M190 40V56H206"/><text class="fn" x="26" y="77">customers.parquet</text><text class="role" x="26" y="104">your table</text></g>
+        <g class="node fp"><path d="M336 40H516L532 56V124H336Z"/><path class="fold" d="M516 40V56H532"/><text class="fn" x="352" y="77">customers.dfp</text><text class="role" x="352" y="104">the fingerprint</text></g>
+        <g class="node ect"><path d="M662 40H842L858 56V124H662Z"/><path class="fold" d="M842 40V56H858"/><text class="fn" x="678" y="77">synthetic.parquet</text><text class="role" x="678" y="104">generated rows</text></g>
+        <g class="node out"><path d="M988 40H1168L1184 56V124H988Z"/><path class="fold" d="M1168 40V56H1184"/><text class="fn" x="1004" y="77">report.html</text><text class="role" x="1004" y="104">PASSED or FAILED</text></g>
+        <g class="node orig"><path d="M10 210H190L206 226V294H10Z"/><path class="fold" d="M190 210V226H206"/><text class="fn txt" x="26" y="247">a later table</text><text class="role" x="26" y="274">next month’s rows</text></g>
+        <g class="node fp"><path d="M336 210H516L532 226V294H336Z"/><path class="fold" d="M516 210V226H532"/><text class="fn" x="352" y="247">customers-later.dfp</text><text class="role" x="352" y="274">a later fingerprint</text></g>
+        <g class="node out"><path d="M662 210H896L912 226V294H662Z"/><path class="fold" d="M896 210V226H912"/><text class="fn" x="678" y="247">drift summary</text><text class="role" x="678" y="274">columns and pairs that moved</text></g>
+        <text class="note" x="10" y="152">read once, by fit</text>
+        <text class="note" x="662" y="320">no rows read, nothing generated</text>
+      </svg>
+      <svg class="flow-tall" viewBox="0 0 340 700" role="img" aria-labelledby="flow-cap" focusable="false">
+        <defs>
+          <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0L10 5L0 10z"/></marker>
+          <marker id="ah2-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah-r" d="M0 0L10 5L0 10z"/></marker>
+        </defs>
+        <path class="edge" d="M150 80V126" marker-end="url(#ah2)"/>
+        <path class="edge" d="M150 200V246" marker-end="url(#ah2)"/>
+        <path class="edge" d="M150 320V366" marker-end="url(#ah2)"/>
+        <path class="edge seal" d="M270 165H316V405H276" marker-end="url(#ah2-r)"/>
+        <path class="edge" d="M150 560V606" marker-end="url(#ah2)"/>
+        <path class="edge" d="M30 165H10V645H26" marker-end="url(#ah2)"/>
+        <g class="step"><circle cx="172" cy="103" r="11"/><text class="step-n" x="172" y="108">1</text><text class="step-l" x="190" y="109">fit</text></g>
+        <g class="step"><circle cx="172" cy="223" r="11"/><text class="step-n" x="172" y="228">2</text><text class="step-l" x="190" y="229">generate</text></g>
+        <g class="step"><circle cx="172" cy="343" r="11"/><text class="step-n" x="172" y="348">3</text><text class="step-l" x="190" y="349">validate</text></g>
+        <g class="step"><circle cx="172" cy="583" r="11"/><text class="step-n" x="172" y="588">4</text><text class="step-l" x="190" y="589">compare</text></g>
+        <text class="note seal-t" x="330" y="285" text-anchor="middle" transform="rotate(90 330 285)">sealed targets</text>
+        <g class="node orig"><path d="M30 10H254L270 26V80H30Z"/><path class="fold" d="M254 10V26H270"/><text class="fn" x="46" y="40">customers.parquet</text><text class="role" x="46" y="64">your table, read once</text></g>
+        <g class="node fp"><path d="M30 130H254L270 146V200H30Z"/><path class="fold" d="M254 130V146H270"/><text class="fn" x="46" y="160">customers.dfp</text><text class="role" x="46" y="184">the fingerprint</text></g>
+        <g class="node ect"><path d="M30 250H254L270 266V320H30Z"/><path class="fold" d="M254 250V266H270"/><text class="fn" x="46" y="280">synthetic.parquet</text><text class="role" x="46" y="304">generated rows</text></g>
+        <g class="node out"><path d="M30 370H254L270 386V440H30Z"/><path class="fold" d="M254 370V386H270"/><text class="fn" x="46" y="400">report.html</text><text class="role" x="46" y="424">PASSED or FAILED</text></g>
+        <g class="node fp"><path d="M30 490H254L270 506V560H30Z"/><path class="fold" d="M254 490V506H270"/><text class="fn" x="46" y="520">customers-later.dfp</text><text class="role" x="46" y="544">a later fingerprint</text></g>
+        <g class="node out"><path d="M30 610H254L270 626V690H30Z"/><path class="fold" d="M254 610V626H270"/><text class="fn" x="46" y="642">drift summary</text><text class="role" x="46" y="666">no rows, no generation</text></g>
+      </svg>
+      </div>
+      <figcaption id="flow-cap" class="sr-only">Fit reads your table once and writes the fingerprint file. Generate draws synthetic rows from the file alone. Validate checks those rows against the file’s sealed targets and writes a report that passes or fails. Compare reads two fingerprints and reports which columns and pairs moved, with no rows and no generation.</figcaption>
+    </figure>
+
+    <ol class="loop" aria-label="The four operations">
+      <li><h3>Fit</h3><p>Learn the fingerprint from your table under a disclosure policy. This is the only step that needs the source data.</p></li>
+      <li><h3>Generate</h3><p>Draw any number of rows from the file, on any machine. The same seed gives the same rows, in parallel or not.</p></li>
+      <li><h3>Validate</h3><p>Score the rows on calibration, sealed and optional holdout evidence, reported separately and never merged into one score.</p></li>
+      <li><h3>Compare</h3><p>Put two fingerprints side by side to find which columns and pairs drifted, with no data and no generation.</p></li>
+    </ol>
   </div>
-  <div class="pair" aria-hidden="true">
-    <figure><svg class="print original" viewBox="0 0 240 260" role="img" aria-label=""><path d="M127.6 130.0 L127.7 130.8 L127.7 131.6 L127.6 132.4 L127.4 133.1 L127.2 133.9 L126.9 134.6 L126.6 135.3 L126.1 136.0 L125.7 136.6 L125.1 137.1 L124.6 137.6 L124.0 138.0 L123.3 138.3 L122.7 138.6 L122.0 138.8 L121.3 138.9 L120.7 138.9 L120.0 138.9 L119.3 138.8 L118.7 138.6 L118.1 138.4 L117.5 138.1 L116.9 137.8 L116.3 137.5 L115.7 137.1 L115.2 136.7 L114.6 136.2 L114.1 135.7 L113.7 135.2 L113.2 134.5 L112.9 133.9 L112.6 133.1 L112.3 132.4 L112.2 131.6 L112.1 130.8 L112.1 130.0 L112.2 129.2 L112.3 128.4 L112.5 127.7 L112.7 126.9 L113.0 126.2 L113.3 125.5 L113.7 124.9 L114.1 124.2 L114.5 123.7 L115.0 123.1 L115.6 122.7 L116.1 122.2 L116.7 121.9 L117.4 121.6 L118.0 121.3 L118.7 121.1 L119.3 121.0 L120.0 120.9 L120.7 120.9 L121.4 121.0 L122.0 121.2 L122.7 121.4 L123.3 121.7 L123.9 122.1 L124.5 122.6 L125.0 123.1 L125.4 123.7 L125.8 124.3 L126.2 125.0 L126.5 125.6 L126.8 126.3 L127.0 127.0 L127.2 127.7 L127.4 128.5 L127.5 129.2 L127.6 130.0 M134.6 129.1 L134.7 130.6 L134.7 132.1 L134.5 133.6 L134.2 135.1 L133.8 136.6 L133.2 138.0 L132.5 139.3 L131.7 140.5 L130.8 141.7 L129.8 142.7 L128.7 143.6 L127.6 144.4 L126.4 145.1 L125.2 145.6 L123.9 145.9 L122.6 146.1 L121.3 146.1 L120.0 146.0 L118.7 145.8 L117.5 145.5 L116.3 145.1 L115.1 144.6 L114.0 144.0 L112.9 143.4 L111.8 142.7 L110.7 141.9 L109.7 141.1 L108.8 140.1 L107.9 139.0 L107.1 137.8 L106.4 136.5 L105.8 135.1 L105.4 133.7 L105.1 132.2 L105.0 130.6 L104.9 129.1 L105.1 127.6 L105.3 126.1 L105.6 124.6 L106.0 123.2 L106.6 121.8 L107.2 120.5 L107.9 119.2 L108.7 118.1 L109.6 117.0 L110.5 116.0 L111.6 115.1 L112.6 114.3 L113.8 113.6 L115.0 113.0 L116.2 112.5 L117.4 112.1 L118.7 111.9 L120.0 111.8 L121.3 111.8 L122.6 111.9 L123.9 112.2 L125.1 112.7 L126.3 113.3 L127.5 114.1 L128.5 115.0 L129.5 116.0 L130.3 117.1 L131.1 118.3 L131.8 119.5 L132.4 120.8 L132.9 122.1 L133.4 123.4 L133.8 124.8 L134.2 126.2 L134.4 127.6 L134.6 129.1 M141.6 128.2 L141.7 130.4 L141.7 132.6 L141.4 134.9 L140.9 137.1 L140.3 139.2 L139.5 141.3 L138.5 143.2 L137.3 145.1 L136.0 146.8 L134.5 148.3 L132.9 149.7 L131.2 150.9 L129.5 151.8 L127.6 152.5 L125.7 153.0 L123.8 153.3 L121.9 153.3 L120.0 153.2 L118.1 152.8 L116.3 152.4 L114.6 151.8 L112.8 151.1 L111.2 150.3 L109.5 149.3 L107.9 148.3 L106.3 147.2 L104.8 145.9 L103.4 144.4 L102.1 142.8 L100.9 141.0 L99.9 139.1 L99.1 137.1 L98.5 134.9 L98.0 132.7 L97.8 130.5 L97.8 128.2 L97.9 126.0 L98.3 123.7 L98.7 121.6 L99.4 119.5 L100.1 117.4 L101.0 115.5 L102.1 113.6 L103.3 111.9 L104.6 110.3 L106.0 108.8 L107.5 107.5 L109.2 106.4 L110.8 105.3 L112.6 104.5 L114.4 103.7 L116.2 103.2 L118.1 102.8 L120.0 102.6 L121.9 102.5 L123.9 102.8 L125.8 103.2 L127.6 103.9 L129.4 104.9 L131.0 106.0 L132.5 107.4 L133.9 108.9 L135.2 110.5 L136.3 112.3 L137.4 114.1 L138.3 115.9 L139.1 117.8 L139.8 119.8 L140.5 121.8 L141.0 123.9 L141.4 126.0 L141.6 128.2 M148.6 127.3 L148.7 130.2 L148.6 133.2 L148.2 136.1 L147.6 139.0 L146.8 141.8 L145.7 144.5 L144.4 147.2 L142.9 149.6 L141.1 151.9 M132.5 158.6 L130.1 159.5 L127.6 160.1 L125.0 160.5 L122.5 160.5 L120.0 160.3 L117.6 159.8 L115.2 159.2 L112.8 158.4 L110.5 157.5 L108.3 156.5 L106.1 155.3 L103.9 154.0 L101.8 152.5 L99.8 150.7 L98.0 148.8 L96.2 146.6 L94.7 144.3 L93.4 141.7 L92.4 139.0 L91.6 136.2 L91.0 133.2 L90.7 130.3 L90.6 127.3 L90.8 124.3 L91.2 121.4 L91.8 118.5 L92.6 115.7 L93.7 113.0 L94.9 110.4 L96.3 108.0 L97.9 105.7 L99.7 103.6 L101.5 101.7 L103.6 100.0 L105.7 98.5 L107.9 97.1 L110.2 95.9 L112.5 94.9 L115.0 94.2 L117.5 93.6 L120.0 93.3 L122.6 93.3 L125.1 93.6 L127.6 94.2 L130.1 95.2 L132.4 96.4 L134.5 98.0 L136.6 99.8 L138.4 101.8 L140.1 104.0 L141.6 106.2 L143.0 108.6 L144.2 111.1 L145.3 113.6 L146.3 116.2 L147.1 118.9 L147.8 121.6 L148.3 124.4 L148.6 127.3 M155.6 126.4 L155.7 130.0 L155.5 133.7 L155.1 137.3 L154.3 140.9 L153.3 144.4 L151.9 147.8 L150.3 151.1 L148.5 154.2 L146.3 157.0 L144.0 159.6 L141.4 161.9 L138.6 163.8 M126.2 167.6 L123.1 167.6 L120.0 167.3 L117.0 166.8 L114.0 166.0 L111.1 165.1 L108.2 164.0 L105.4 162.8 L102.7 161.3 L100.0 159.7 L97.4 157.8 L94.9 155.6 L92.6 153.2 L90.5 150.5 L88.6 147.5 L87.0 144.3 L85.7 140.9 L84.7 137.4 L84.0 133.8 L83.6 130.1 L83.5 126.4 L83.7 122.7 L84.1 119.0 L84.9 115.5 L85.9 112.0 L87.2 108.6 L88.7 105.4 L90.5 102.4 L92.5 99.6 L94.7 97.0 L97.1 94.6 L99.6 92.5 L102.2 90.6 L105.0 88.9 L107.8 87.4 L110.7 86.1 L113.7 85.1 L116.8 84.4 L120.0 84.0 L123.2 84.0 L126.4 84.4 L129.5 85.2 L132.5 86.5 L135.4 88.1 L138.1 90.0 L140.6 92.3 L142.8 94.7 L144.9 97.4 L146.8 100.2 L148.6 103.1 L150.1 106.2 L151.5 109.3 L152.8 112.5 L153.8 115.9 L154.7 119.3 L155.3 122.8 L155.6 126.4 M162.6 125.5 L162.7 129.8 L162.4 134.2 L161.9 138.5 L161.0 142.8 L159.7 147.0 L158.2 151.1 L156.3 155.1 L154.1 158.8 L151.6 162.2 L148.7 165.3 L145.6 168.0 L142.3 170.3 L138.7 172.1 L135.0 173.5 L131.2 174.3 L127.5 174.7 L123.7 174.7 L120.0 174.4 L116.4 173.7 L112.8 172.9 L109.3 171.8 L105.9 170.6 L102.5 169.1 L99.2 167.4 L96.0 165.4 L92.9 163.1 L89.9 160.5 L87.2 157.5 L84.7 154.3 L82.5 150.7 L80.6 146.9 L79.0 142.8 L77.8 138.6 L77.0 134.3 M77.0 116.7 L77.9 112.4 L79.1 108.2 L80.7 104.2 L82.6 100.4 L84.8 96.8 L87.2 93.5 L89.8 90.4 L92.7 87.6 L95.6 85.0 L98.8 82.7 L102.0 80.6 L105.4 78.8 L108.9 77.2 L112.5 76.0 L116.2 75.2 L120.0 74.7 L123.8 74.7 L127.6 75.2 L131.3 76.3 L134.9 77.8 L138.4 79.7 L141.6 82.1 L144.5 84.7 L147.3 87.7 L149.8 90.8 L152.1 94.2 L154.2 97.7 L156.1 101.3 L157.8 105.0 L159.3 108.9 L160.5 112.9 L161.5 117.0 L162.2 121.2 L162.6 125.5 M169.5 124.6 L169.6 129.6 L169.3 134.7 L168.6 139.7 L167.6 144.7 L166.2 149.7 L164.5 154.4 L162.3 159.0 L159.8 163.4 L156.8 167.4 L153.5 171.0 L149.9 174.2 L145.9 176.8 L141.8 178.9 L137.5 180.4 L133.1 181.3 L128.7 181.7 L124.3 181.7 L120.0 181.4 L115.8 180.7 L111.6 179.8 L107.6 178.6 L103.6 177.1 L99.6 175.4 L95.8 173.4 L92.0 171.1 L88.4 168.4 L85.0 165.3 L81.8 161.8 L79.0 158.0 L76.4 153.9 L74.2 149.4 L72.4 144.7 L71.0 139.9 M69.2 119.4 L69.8 114.3 L70.9 109.3 L72.4 104.4 L74.2 99.8 L76.5 95.4 L79.0 91.2 L81.9 87.4 L84.9 83.8 L88.2 80.6 L91.7 77.6 L95.3 74.8 L99.1 72.4 L103.0 70.2 L107.0 68.3 L111.2 66.9 L115.6 65.9 L120.0 65.4 L124.5 65.5 L128.9 66.1 L133.2 67.3 L137.4 69.1 L141.3 71.4 L145.0 74.1 L148.5 77.2 L151.7 80.6 L154.7 84.3 L157.4 88.1 L159.9 92.1 L162.1 96.3 L164.1 100.7 L165.8 105.2 L167.2 109.9 L168.3 114.7 L169.1 119.6 L169.5 124.6 M176.4 123.7 L176.4 129.4 L176.1 135.2 L175.4 141.0 L174.3 146.7 L172.7 152.3 L170.8 157.8 L168.4 163.1 L165.5 168.1 L162.1 172.6 L158.3 176.8 L154.1 180.3 M134.9 188.3 L129.9 188.8 L124.9 188.8 L120.0 188.4 L115.2 187.7 L110.5 186.7 L105.8 185.4 L101.2 183.8 L96.7 181.8 L92.3 179.5 L88.0 176.8 L83.9 173.7 L80.1 170.1 L76.5 166.1 L73.3 161.7 L70.4 157.0 L67.9 152.0 L65.8 146.7 L64.1 141.1 L62.8 135.4 L62.1 129.6 L61.8 123.7 L62.0 117.8 L62.7 111.9 L63.9 106.2 L65.6 100.7 L67.8 95.4 L70.4 90.4 L73.3 85.7 L76.6 81.3 L80.1 77.3 L83.8 73.5 L87.7 70.1 L91.8 66.9 L96.1 64.0 L100.5 61.5 L105.2 59.4 L110.0 57.7 L115.0 56.6 L120.0 56.1 L125.1 56.2 L130.1 57.0 L135.0 58.5 L139.8 60.5 L144.3 63.2 L148.5 66.2 L152.5 69.7 L156.2 73.6 L159.6 77.7 L162.7 82.0 L165.6 86.6 L168.1 91.4 L170.4 96.4 L172.3 101.6 L173.9 106.9 L175.1 112.4 L175.9 118.0 L176.4 123.7 M183.2 122.8 L183.3 129.2 L182.9 135.7 L182.2 142.2 L181.0 148.6 L179.3 155.0 L177.1 161.2 L174.4 167.1 L171.2 172.7 L167.4 177.9 L163.1 182.5 L158.3 186.4 L153.2 189.7 L147.8 192.2 L142.3 194.0 L136.7 195.2 L131.1 195.8 L125.5 195.8 L120.0 195.5 L114.6 194.7 L109.3 193.7 L104.0 192.2 L98.8 190.4 M79.5 178.9 L75.2 174.9 L71.2 170.4 L67.6 165.5 L64.4 160.2 L61.5 154.5 L59.1 148.6 L57.2 142.4 L55.7 136.0 L54.8 129.4 L54.4 122.8 L54.7 116.2 L55.5 109.6 L56.9 103.1 L58.9 96.9 L61.4 91.0 L64.3 85.4 L67.7 80.2 L71.3 75.3 L75.2 70.8 L79.4 66.5 L83.7 62.6 L88.3 59.0 L93.1 55.7 L98.1 52.8 L103.3 50.4 L108.7 48.5 L114.3 47.3 L120.0 46.8 L125.7 47.0 L131.3 48.0 L136.9 49.7 L142.2 52.0 L147.2 54.9 L152.0 58.3 L156.5 62.2 L160.7 66.4 L164.5 71.0 L168.1 75.9 L171.3 81.0 L174.2 86.4 L176.7 92.1 L178.8 97.9 L180.5 103.9 L181.8 110.1 L182.7 116.4 L183.2 122.8 M190.0 121.9 L190.1 129.0 L189.8 136.2 L189.0 143.4 L187.7 150.6 L185.9 157.7 L183.5 164.6 L180.5 171.2 L176.9 177.4 L172.6 183.1 L167.8 188.2 L162.5 192.5 L156.8 196.0 M132.3 202.8 L126.1 202.9 L120.0 202.6 L114.0 201.9 L108.1 200.7 L102.2 199.1 L96.5 197.1 L90.8 194.6 L85.4 191.6 L80.1 188.1 L75.1 184.1 L70.4 179.6 L66.0 174.6 L62.0 169.2 L58.3 163.3 L55.1 157.1 L52.4 150.5 L50.2 143.6 L48.5 136.6 L47.5 129.3 L47.1 121.9 L47.4 114.5 L48.3 107.2 L50.0 100.1 L52.2 93.2 L55.0 86.7 L58.3 80.5 L62.0 74.7 L66.1 69.3 L70.4 64.2 L74.9 59.4 L79.7 55.0 L84.8 50.9 L90.1 47.3 L95.6 44.0 L101.4 41.4 L107.5 39.4 L113.7 38.1 L120.0 37.6 L126.3 37.9 L132.6 39.0 L138.7 40.9 L144.6 43.5 L150.2 46.7 L155.5 50.4 L160.5 54.6 L165.2 59.3 L169.5 64.3 L173.5 69.7 L177.1 75.4 L180.2 81.5 L183.0 87.8 L185.3 94.3 L187.1 101.0 L188.5 107.9 L189.5 114.8 L190.0 121.9 M196.8 121.0 L197.0 128.8 L196.7 136.7 L195.9 144.6 L194.6 152.6 L192.6 160.4 L190.0 168.0 L186.7 175.3 L182.6 182.1 L177.9 188.3 L172.5 193.8 L166.7 198.5 L160.4 202.3 L153.8 205.3 L147.1 207.5 L140.3 209.0 L133.5 209.8 L126.7 210.1 L120.0 209.8 L113.4 209.0 L106.8 207.8 L100.4 206.0 L94.1 203.8 L87.9 201.0 L81.9 197.6 L76.2 193.7 L70.7 189.3 L65.6 184.3 L60.8 178.8 L56.3 172.8 L52.3 166.4 L48.7 159.6 L45.7 152.5 L43.2 144.9 L41.3 137.1 L40.1 129.1 L39.7 121.0 L40.1 112.9 L41.2 104.8 L43.1 97.0 L45.6 89.5 L48.7 82.4 L52.4 75.6 M70.4 52.3 L75.7 47.4 L81.2 42.9 L87.0 38.8 L93.2 35.3 L99.6 32.4 L106.2 30.2 L113.1 28.9 L120.0 28.4 L126.9 28.8 L133.8 30.1 L140.5 32.1 L146.9 34.9 L153.1 38.4 L159.0 42.4 L164.6 47.0 L169.8 52.1 L174.5 57.6 L178.9 63.5 L182.8 69.8 L186.3 76.5 L189.2 83.5 L191.7 90.7 L193.6 98.1 L195.1 105.6 L196.2 113.2 L196.8 121.0 M203.6 120.1 L203.9 128.6 L203.6 137.2 L202.8 145.9 L201.4 154.6 L199.3 163.1 L196.4 171.4 L192.8 179.3 L188.3 186.7 L183.1 193.4 L177.2 199.4 L170.8 204.4 L163.9 208.6 L156.8 211.8 L149.5 214.3 L142.1 215.9 L134.7 216.9 L127.3 217.3 L120.0 217.1 L112.8 216.3 L105.6 214.9 L98.6 213.0 L91.7 210.4 L85.0 207.3 L78.6 203.6 L72.3 199.3 L66.4 194.4 L60.8 188.9 L55.5 183.0 L50.7 176.5 L46.2 169.6 L42.3 162.3 L38.9 154.4 L36.1 146.2 L34.0 137.7 M34.1 102.5 L36.2 94.0 L39.1 85.8 L42.5 78.1 L46.4 70.7 L50.8 63.8 L55.5 57.2 L60.6 51.0 L65.9 45.2 L71.6 39.7 L77.6 34.7 L84.0 30.3 L90.7 26.5 L97.7 23.4 L105.0 21.2 L112.5 19.8 L120.0 19.4 L127.5 19.8 L135.0 21.2 L142.3 23.4 L149.3 26.4 L156.1 30.0 L162.6 34.4 L168.7 39.3 L174.3 44.8 L179.6 50.8 L184.3 57.3 L188.6 64.3 L192.3 71.6 L195.4 79.2 L198.0 87.1 L200.1 95.1 L201.7 103.3 L202.9 111.7 L203.6 120.1 M210.4 119.2 L210.8 128.4 L210.6 137.8 L209.8 147.2 L208.3 156.6 L206.0 165.8 L202.9 174.8 L198.8 183.4 L193.9 191.3 L188.2 198.5 L181.8 204.9 M151.9 221.1 L143.9 223.0 L135.9 224.1 L127.9 224.6 L120.0 224.4 L112.1 223.5 L104.4 222.0 L96.8 219.9 L89.4 217.0 L82.2 213.6 L75.2 209.5 L68.5 204.7 L62.1 199.4 L56.0 193.6 L50.3 187.2 L45.0 180.3 L40.1 172.8 L35.7 164.9 L32.0 156.4 L29.0 147.6 L26.8 138.3 L25.4 128.8 L25.1 119.2 L25.7 109.6 L27.1 100.2 L29.5 91.0 L32.5 82.2 L36.3 73.8 L40.5 65.8 L45.1 58.2 L50.2 51.1 L55.6 44.3 L61.4 37.9 L67.5 32.0 L74.0 26.6 L80.9 21.8 L88.2 17.7 L95.9 14.5 L103.8 12.2 L111.8 10.8 L120.0 10.3 L128.2 10.9 L136.2 12.3 L144.1 14.6 L151.8 17.7 L159.1 21.6 L166.2 26.2 L172.8 31.5 L179.0 37.5 L184.6 44.0 L189.7 51.1 L194.3 58.7 L198.2 66.7 L201.5 75.0 L204.3 83.5 L206.6 92.2 L208.3 101.1 L209.6 110.1 L210.4 119.2" fill="none" stroke="currentColor" stroke-width="3.1" stroke-linecap="round" stroke-linejoin="round"/></svg><figcaption>Original</figcaption></figure>
-    <figure><svg class="print ectype" viewBox="0 0 240 260" role="img" aria-label=""><path d="M127.6 130.0 L127.7 130.8 L127.7 131.6 L127.6 132.4 L127.4 133.1 L127.2 133.9 L126.9 134.6 L126.6 135.3 L126.1 136.0 L125.7 136.6 L125.1 137.1 L124.6 137.6 L124.0 138.0 L123.3 138.3 L122.7 138.6 L122.0 138.8 L121.3 138.9 L120.7 138.9 L120.0 138.9 L119.3 138.8 L118.7 138.6 L118.1 138.4 L117.5 138.1 L116.9 137.8 L116.3 137.5 L115.7 137.1 L115.2 136.7 L114.6 136.2 L114.1 135.7 L113.7 135.2 L113.2 134.5 L112.9 133.9 L112.6 133.1 L112.3 132.4 L112.2 131.6 L112.1 130.8 L112.1 130.0 L112.2 129.2 L112.3 128.4 L112.5 127.7 L112.7 126.9 L113.0 126.2 L113.3 125.5 L113.7 124.9 L114.1 124.2 L114.5 123.7 L115.0 123.1 L115.6 122.7 L116.1 122.2 L116.7 121.9 L117.4 121.6 L118.0 121.3 L118.7 121.1 L119.3 121.0 L120.0 120.9 L120.7 120.9 L121.4 121.0 L122.0 121.2 L122.7 121.4 L123.3 121.7 L123.9 122.1 L124.5 122.6 L125.0 123.1 L125.4 123.7 L125.8 124.3 L126.2 125.0 L126.5 125.6 L126.8 126.3 L127.0 127.0 L127.2 127.7 L127.4 128.5 L127.5 129.2 L127.6 130.0 M134.6 129.1 L134.7 130.6 L134.7 132.1 L134.5 133.6 L134.2 135.1 L133.8 136.6 L133.2 138.0 L132.5 139.3 L131.7 140.5 L130.8 141.7 L129.8 142.7 L128.7 143.6 L127.6 144.4 L126.4 145.1 L125.2 145.6 L123.9 145.9 L122.6 146.1 L121.3 146.1 L120.0 146.0 L118.7 145.8 L117.5 145.5 L116.3 145.1 L115.1 144.6 L114.0 144.0 L112.9 143.4 L111.8 142.7 L110.7 141.9 L109.7 141.1 L108.8 140.1 L107.9 139.0 L107.1 137.8 L106.4 136.5 L105.8 135.1 L105.4 133.7 L105.1 132.2 L105.0 130.6 L104.9 129.1 L105.1 127.6 L105.3 126.1 L105.6 124.6 L106.0 123.2 L106.6 121.8 L107.2 120.5 L107.9 119.2 L108.7 118.1 L109.6 117.0 L110.5 116.0 L111.6 115.1 L112.6 114.3 L113.8 113.6 L115.0 113.0 L116.2 112.5 L117.4 112.1 L118.7 111.9 L120.0 111.8 L121.3 111.8 L122.6 111.9 L123.9 112.2 L125.1 112.7 L126.3 113.3 L127.5 114.1 L128.5 115.0 L129.5 116.0 L130.3 117.1 L131.1 118.3 L131.8 119.5 L132.4 120.8 L132.9 122.1 L133.4 123.4 L133.8 124.8 L134.2 126.2 L134.4 127.6 L134.6 129.1 M141.6 128.2 L141.7 130.4 L141.7 132.6 L141.4 134.9 L140.9 137.1 L140.3 139.2 L139.5 141.3 L138.5 143.2 L137.3 145.1 L136.0 146.8 L134.5 148.3 L132.9 149.7 L131.2 150.9 L129.5 151.8 L127.6 152.5 L125.7 153.0 L123.8 153.3 L121.9 153.3 L120.0 153.2 L118.1 152.8 L116.3 152.4 L114.6 151.8 L112.8 151.1 L111.2 150.3 L109.5 149.3 L107.9 148.3 L106.3 147.2 L104.8 145.9 L103.4 144.4 L102.1 142.8 L100.9 141.0 L99.9 139.1 L99.1 137.1 L98.5 134.9 L98.0 132.7 L97.8 130.5 L97.8 128.2 L97.9 126.0 L98.3 123.7 L98.7 121.6 L99.4 119.5 L100.1 117.4 L101.0 115.5 L102.1 113.6 L103.3 111.9 L104.6 110.3 L106.0 108.8 L107.5 107.5 L109.2 106.4 L110.8 105.3 L112.6 104.5 L114.4 103.7 L116.2 103.2 L118.1 102.8 L120.0 102.6 L121.9 102.5 L123.9 102.8 L125.8 103.2 L127.6 103.9 L129.4 104.9 L131.0 106.0 L132.5 107.4 L133.9 108.9 L135.2 110.5 L136.3 112.3 L137.4 114.1 L138.3 115.9 L139.1 117.8 L139.8 119.8 L140.5 121.8 L141.0 123.9 L141.4 126.0 L141.6 128.2 M148.6 127.3 L148.7 130.2 L148.6 133.2 L148.2 136.1 L147.6 139.0 L146.8 141.8 L145.7 144.5 L144.4 147.2 L142.9 149.6 L141.1 151.9 M132.5 158.6 L130.1 159.5 L127.6 160.1 L125.0 160.5 L122.5 160.5 L120.0 160.3 L117.6 159.8 L115.2 159.2 L112.8 158.4 L110.5 157.5 L108.3 156.5 L106.1 155.3 L103.9 154.0 L101.8 152.5 L99.8 150.7 L98.0 148.8 L96.2 146.6 L94.7 144.3 L93.4 141.7 L92.4 139.0 L91.6 136.2 L91.0 133.2 L90.7 130.3 L90.6 127.3 L90.8 124.3 L91.2 121.4 L91.8 118.5 L92.6 115.7 L93.7 113.0 L94.9 110.4 L96.3 108.0 L97.9 105.7 L99.7 103.6 L101.5 101.7 L103.6 100.0 L105.7 98.5 L107.9 97.1 L110.2 95.9 L112.5 94.9 L115.0 94.2 L117.5 93.6 L120.0 93.3 L122.6 93.3 L125.1 93.6 L127.6 94.2 L130.1 95.2 L132.4 96.4 L134.5 98.0 L136.6 99.8 L138.4 101.8 L140.1 104.0 L141.6 106.2 L143.0 108.6 L144.2 111.1 L145.3 113.6 L146.3 116.2 L147.1 118.9 L147.8 121.6 L148.3 124.4 L148.6 127.3 M155.6 126.4 L155.7 130.0 L155.5 133.7 L155.1 137.3 L154.3 140.9 L153.3 144.4 L151.9 147.8 L150.3 151.1 L148.5 154.2 L146.3 157.0 L144.0 159.6 L141.4 161.9 L138.6 163.8 M126.2 167.6 L123.1 167.6 L120.0 167.3 L117.0 166.8 L114.0 166.0 L111.1 165.1 L108.2 164.0 L105.4 162.8 L102.7 161.3 L100.0 159.7 L97.4 157.8 L94.9 155.6 L92.6 153.2 L90.5 150.5 L88.6 147.5 L87.0 144.3 L85.7 140.9 L84.7 137.4 L84.0 133.8 L83.6 130.1 L83.5 126.4 L83.7 122.7 L84.1 119.0 L84.9 115.5 L85.9 112.0 L87.2 108.6 L88.7 105.4 L90.5 102.4 L92.5 99.6 L94.7 97.0 L97.1 94.6 L99.6 92.5 L102.2 90.6 L105.0 88.9 L107.8 87.4 L110.7 86.1 L113.7 85.1 L116.8 84.4 L120.0 84.0 L123.2 84.0 L126.4 84.4 L129.5 85.2 L132.5 86.5 L135.4 88.1 L138.1 90.0 L140.6 92.3 L142.8 94.7 L144.9 97.4 L146.8 100.2 L148.6 103.1 L150.1 106.2 L151.5 109.3 L152.8 112.5 L153.8 115.9 L154.7 119.3 L155.3 122.8 L155.6 126.4 M162.6 125.5 L162.7 129.8 L162.4 134.2 L161.9 138.5 L161.0 142.8 L159.7 147.0 L158.2 151.1 L156.3 155.1 L154.1 158.8 L151.6 162.2 L148.7 165.3 L145.6 168.0 L142.3 170.3 L138.7 172.1 L135.0 173.5 L131.2 174.3 L127.5 174.7 L123.7 174.7 L120.0 174.4 L116.4 173.7 L112.8 172.9 L109.3 171.8 L105.9 170.6 L102.5 169.1 L99.2 167.4 L96.0 165.4 L92.9 163.1 L89.9 160.5 L87.2 157.5 L84.7 154.3 L82.5 150.7 L80.6 146.9 L79.0 142.8 L77.8 138.6 L77.0 134.3 M77.0 116.7 L77.9 112.4 L79.1 108.2 L80.7 104.2 L82.6 100.4 L84.8 96.8 L87.2 93.5 L89.8 90.4 L92.7 87.6 L95.6 85.0 L98.8 82.7 L102.0 80.6 L105.4 78.8 L108.9 77.2 L112.5 76.0 L116.2 75.2 L120.0 74.7 L123.8 74.7 L127.6 75.2 L131.3 76.3 L134.9 77.8 L138.4 79.7 L141.6 82.1 L144.5 84.7 L147.3 87.7 L149.8 90.8 L152.1 94.2 L154.2 97.7 L156.1 101.3 L157.8 105.0 L159.3 108.9 L160.5 112.9 L161.5 117.0 L162.2 121.2 L162.6 125.5 M169.5 124.6 L169.6 129.6 L169.3 134.7 L168.6 139.7 L167.6 144.7 L166.2 149.7 L164.5 154.4 L162.3 159.0 L159.8 163.4 L156.8 167.4 L153.5 171.0 L149.9 174.2 L145.9 176.8 L141.8 178.9 L137.5 180.4 L133.1 181.3 L128.7 181.7 L124.3 181.7 L120.0 181.4 L115.8 180.7 L111.6 179.8 L107.6 178.6 L103.6 177.1 L99.6 175.4 L95.8 173.4 L92.0 171.1 L88.4 168.4 L85.0 165.3 L81.8 161.8 L79.0 158.0 L76.4 153.9 L74.2 149.4 L72.4 144.7 L71.0 139.9 M69.2 119.4 L69.8 114.3 L70.9 109.3 L72.4 104.4 L74.2 99.8 L76.5 95.4 L79.0 91.2 L81.9 87.4 L84.9 83.8 L88.2 80.6 L91.7 77.6 L95.3 74.8 L99.1 72.4 L103.0 70.2 L107.0 68.3 L111.2 66.9 L115.6 65.9 L120.0 65.4 L124.5 65.5 L128.9 66.1 L133.2 67.3 L137.4 69.1 L141.3 71.4 L145.0 74.1 L148.5 77.2 L151.7 80.6 L154.7 84.3 L157.4 88.1 L159.9 92.1 L162.1 96.3 L164.1 100.7 L165.8 105.2 L167.2 109.9 L168.3 114.7 L169.1 119.6 L169.5 124.6 M176.4 123.7 L176.4 129.4 L176.1 135.2 L175.4 141.0 L174.3 146.7 L172.7 152.3 L170.8 157.8 L168.4 163.1 L165.5 168.1 L162.1 172.6 L158.3 176.8 L154.1 180.3 M134.9 188.3 L129.9 188.8 L124.9 188.8 L120.0 188.4 L115.2 187.7 L110.5 186.7 L105.8 185.4 L101.2 183.8 L96.7 181.8 L92.3 179.5 L88.0 176.8 L83.9 173.7 L80.1 170.1 L76.5 166.1 L73.3 161.7 L70.4 157.0 L67.9 152.0 L65.8 146.7 L64.1 141.1 L62.8 135.4 L62.1 129.6 L61.8 123.7 L62.0 117.8 L62.7 111.9 L63.9 106.2 L65.6 100.7 L67.8 95.4 L70.4 90.4 L73.3 85.7 L76.6 81.3 L80.1 77.3 L83.8 73.5 L87.7 70.1 L91.8 66.9 L96.1 64.0 L100.5 61.5 L105.2 59.4 L110.0 57.7 L115.0 56.6 L120.0 56.1 L125.1 56.2 L130.1 57.0 L135.0 58.5 L139.8 60.5 L144.3 63.2 L148.5 66.2 L152.5 69.7 L156.2 73.6 L159.6 77.7 L162.7 82.0 L165.6 86.6 L168.1 91.4 L170.4 96.4 L172.3 101.6 L173.9 106.9 L175.1 112.4 L175.9 118.0 L176.4 123.7 M183.2 122.8 L183.3 129.2 L182.9 135.7 L182.2 142.2 L181.0 148.6 L179.3 155.0 L177.1 161.2 L174.4 167.1 L171.2 172.7 L167.4 177.9 L163.1 182.5 L158.3 186.4 L153.2 189.7 L147.8 192.2 L142.3 194.0 L136.7 195.2 L131.1 195.8 L125.5 195.8 L120.0 195.5 L114.6 194.7 L109.3 193.7 L104.0 192.2 L98.8 190.4 M79.5 178.9 L75.2 174.9 L71.2 170.4 L67.6 165.5 L64.4 160.2 L61.5 154.5 L59.1 148.6 L57.2 142.4 L55.7 136.0 L54.8 129.4 L54.4 122.8 L54.7 116.2 L55.5 109.6 L56.9 103.1 L58.9 96.9 L61.4 91.0 L64.3 85.4 L67.7 80.2 L71.3 75.3 L75.2 70.8 L79.4 66.5 L83.7 62.6 L88.3 59.0 L93.1 55.7 L98.1 52.8 L103.3 50.4 L108.7 48.5 L114.3 47.3 L120.0 46.8 L125.7 47.0 L131.3 48.0 L136.9 49.7 L142.2 52.0 L147.2 54.9 L152.0 58.3 L156.5 62.2 L160.7 66.4 L164.5 71.0 L168.1 75.9 L171.3 81.0 L174.2 86.4 L176.7 92.1 L178.8 97.9 L180.5 103.9 L181.8 110.1 L182.7 116.4 L183.2 122.8 M190.0 121.9 L190.1 129.0 L189.8 136.2 L189.0 143.4 L187.7 150.6 L185.9 157.7 L183.5 164.6 L180.5 171.2 L176.9 177.4 L172.6 183.1 L167.8 188.2 L162.5 192.5 L156.8 196.0 M132.3 202.8 L126.1 202.9 L120.0 202.6 L114.0 201.9 L108.1 200.7 L102.2 199.1 L96.5 197.1 L90.8 194.6 L85.4 191.6 L80.1 188.1 L75.1 184.1 L70.4 179.6 L66.0 174.6 L62.0 169.2 L58.3 163.3 L55.1 157.1 L52.4 150.5 L50.2 143.6 L48.5 136.6 L47.5 129.3 L47.1 121.9 L47.4 114.5 L48.3 107.2 L50.0 100.1 L52.2 93.2 L55.0 86.7 L58.3 80.5 L62.0 74.7 L66.1 69.3 L70.4 64.2 L74.9 59.4 L79.7 55.0 L84.8 50.9 L90.1 47.3 L95.6 44.0 L101.4 41.4 L107.5 39.4 L113.7 38.1 L120.0 37.6 L126.3 37.9 L132.6 39.0 L138.7 40.9 L144.6 43.5 L150.2 46.7 L155.5 50.4 L160.5 54.6 L165.2 59.3 L169.5 64.3 L173.5 69.7 L177.1 75.4 L180.2 81.5 L183.0 87.8 L185.3 94.3 L187.1 101.0 L188.5 107.9 L189.5 114.8 L190.0 121.9 M196.8 121.0 L197.0 128.8 L196.7 136.7 L195.9 144.6 L194.6 152.6 L192.6 160.4 L190.0 168.0 L186.7 175.3 L182.6 182.1 L177.9 188.3 L172.5 193.8 L166.7 198.5 L160.4 202.3 L153.8 205.3 L147.1 207.5 L140.3 209.0 L133.5 209.8 L126.7 210.1 L120.0 209.8 L113.4 209.0 L106.8 207.8 L100.4 206.0 L94.1 203.8 L87.9 201.0 L81.9 197.6 L76.2 193.7 L70.7 189.3 L65.6 184.3 L60.8 178.8 L56.3 172.8 L52.3 166.4 L48.7 159.6 L45.7 152.5 L43.2 144.9 L41.3 137.1 L40.1 129.1 L39.7 121.0 L40.1 112.9 L41.2 104.8 L43.1 97.0 L45.6 89.5 L48.7 82.4 L52.4 75.6 M70.4 52.3 L75.7 47.4 L81.2 42.9 L87.0 38.8 L93.2 35.3 L99.6 32.4 L106.2 30.2 L113.1 28.9 L120.0 28.4 L126.9 28.8 L133.8 30.1 L140.5 32.1 L146.9 34.9 L153.1 38.4 L159.0 42.4 L164.6 47.0 L169.8 52.1 L174.5 57.6 L178.9 63.5 L182.8 69.8 L186.3 76.5 L189.2 83.5 L191.7 90.7 L193.6 98.1 L195.1 105.6 L196.2 113.2 L196.8 121.0 M203.6 120.1 L203.9 128.6 L203.6 137.2 L202.8 145.9 L201.4 154.6 L199.3 163.1 L196.4 171.4 L192.8 179.3 L188.3 186.7 L183.1 193.4 L177.2 199.4 L170.8 204.4 L163.9 208.6 L156.8 211.8 L149.5 214.3 L142.1 215.9 L134.7 216.9 L127.3 217.3 L120.0 217.1 L112.8 216.3 L105.6 214.9 L98.6 213.0 L91.7 210.4 L85.0 207.3 L78.6 203.6 L72.3 199.3 L66.4 194.4 L60.8 188.9 L55.5 183.0 L50.7 176.5 L46.2 169.6 L42.3 162.3 L38.9 154.4 L36.1 146.2 L34.0 137.7 M34.1 102.5 L36.2 94.0 L39.1 85.8 L42.5 78.1 L46.4 70.7 L50.8 63.8 L55.5 57.2 L60.6 51.0 L65.9 45.2 L71.6 39.7 L77.6 34.7 L84.0 30.3 L90.7 26.5 L97.7 23.4 L105.0 21.2 L112.5 19.8 L120.0 19.4 L127.5 19.8 L135.0 21.2 L142.3 23.4 L149.3 26.4 L156.1 30.0 L162.6 34.4 L168.7 39.3 L174.3 44.8 L179.6 50.8 L184.3 57.3 L188.6 64.3 L192.3 71.6 L195.4 79.2 L198.0 87.1 L200.1 95.1 L201.7 103.3 L202.9 111.7 L203.6 120.1 M210.4 119.2 L210.8 128.4 L210.6 137.8 L209.8 147.2 L208.3 156.6 L206.0 165.8 L202.9 174.8 L198.8 183.4 L193.9 191.3 L188.2 198.5 L181.8 204.9 M151.9 221.1 L143.9 223.0 L135.9 224.1 L127.9 224.6 L120.0 224.4 L112.1 223.5 L104.4 222.0 L96.8 219.9 L89.4 217.0 L82.2 213.6 L75.2 209.5 L68.5 204.7 L62.1 199.4 L56.0 193.6 L50.3 187.2 L45.0 180.3 L40.1 172.8 L35.7 164.9 L32.0 156.4 L29.0 147.6 L26.8 138.3 L25.4 128.8 L25.1 119.2 L25.7 109.6 L27.1 100.2 L29.5 91.0 L32.5 82.2 L36.3 73.8 L40.5 65.8 L45.1 58.2 L50.2 51.1 L55.6 44.3 L61.4 37.9 L67.5 32.0 L74.0 26.6 L80.9 21.8 L88.2 17.7 L95.9 14.5 L103.8 12.2 L111.8 10.8 L120.0 10.3 L128.2 10.9 L136.2 12.3 L144.1 14.6 L151.8 17.7 L159.1 21.6 L166.2 26.2 L172.8 31.5 L179.0 37.5 L184.6 44.0 L189.7 51.1 L194.3 58.7 L198.2 66.7 L201.5 75.0 L204.3 83.5 L206.6 92.2 L208.3 101.1 L209.6 110.1 L210.4 119.2" fill="none" stroke="currentColor" stroke-width="3.1" stroke-linecap="round" stroke-linejoin="round"/></svg><figcaption>Ectype</figcaption></figure>
+
+  <div class="run">
+    <figure class="run-inner" aria-labelledby="run-cap">
+      <figcaption id="run-cap" class="run-cap">
+        <p>The same loop on the command line, on an example customers table: fit with the defaults, generate, validate. Under each command is what it printed. Long lines are shortened and a few are left out.</p>
+        <p class="run-exit"><code>validate</code> ends with <code>RESULT: PASSED</code> or <code>RESULT: FAILED</code> and exits 1 on failure, so it can gate a script or a CI job.</p>
+        <p class="run-links"><button type="button" class="copy" data-copy="ectype profile customers.parquet -o customers.dfp --constraint &quot;signup_date &lt;= last_order_date&quot; --derived &quot;total=quantity * unit_price&quot;&#10;ectype generate customers.dfp --rows 5000 --seed 42 -o synthetic.parquet&#10;ectype validate customers.dfp synthetic.parquet --html report.html" aria-label="Copy the three commands">Copy the commands</button> <a data-site="docs" href="https://github.com/EctypeHQ/ectype/blob/main/docs/guide/README.md">Read the guide</a></p>
+      </figcaption>
+      <div class="term" id="session">
+        <p class="term-bar"><span>Terminal</span></p>
+<pre tabindex="0" aria-label="Terminal session: profile, generate and validate, with their output"><code><span class="blk"><span class="cmd">ectype profile customers.parquet -o customers.dfp \
+    --constraint "signup_date &lt;= last_order_date" \
+    --derived "total=quantity * unit_price"</span><span class="out">wrote customers.dfp
+  1000 rows x 9 columns, policy=standard, targets=46 calibration + 40 sealed
+  joint model: chain_copula (effort="balanced", the default)
+  5 suggested constraints (review with: ectype constraints customers.dfp --list)
+  <span class="warn">warning: small table (1000 rows): stored quantiles are coarse by policy</span></span></span><span class="blk"><span class="cmd">ectype generate customers.dfp --rows 5000 --seed 42 -o synthetic.parquet</span><span class="out">wrote 5000 rows to synthetic.parquet
+  <span class="dim">seed=42 chunk_size=100000 chunks=1 acceptance=1.000 time=0.09s
+  note: constraint 'user_1' holds by construction (…); still checked on every row</span></span></span><span class="blk"><span class="cmd">ectype validate customers.dfp synthetic.parquet --html report.html</span><span class="out">Validation <span class="pass">PASSED</span>  fingerprint 19f9bc3d9701  policy=standard  rows=5000
+  structural   5/5 checks ok
+  constraints  1/1 hard constraints satisfied
+  <span class="dim">calibration  44/46 passed (95.7%) (optimizer evidence only)</span>
+  <span class="lit">sealed       39/40 passed (97.5%) (primary evidence of fidelity)</span>
+               <span class="lit">0 failed beyond sampling noise (sensitivity standard, FDR q=0.05)</span>
+  calibration - sealed pass-rate gap: -1.8 pts
+wrote report.html
+RESULT: <span class="pass">PASSED</span></span></span></code></pre>
+      </div>
+    </figure>
   </div>
+</section>
+
+<!-- 2b. The profile report: a fingerprint read as one page. The two pages linked here are real
+     output (tools/make_report_example.py), the images are taken from them (tools/report_shots.py),
+     and the numbers come from data/report-example.json. See CLOUD.md, revision 7. -->
+<section class="profile" id="profile" aria-labelledby="profile-title">
+  <div class="split-head">
+    <h2 id="profile-title">Read a table from its fingerprint</h2>
+    <div>
+      <p><code>ectype report</code> turns a fingerprint into one self-contained page: each column’s distribution, how the columns move together, what is missing, the relationships found and what the privacy policy did. Give it two fingerprints and it shows what drifted between them.</p>
+      <p>The page is built from the fingerprint alone, so it can go wherever the fingerprint can, even where the data cannot. In Python, <code>ectype.report(fp)</code>.</p>
+    </div>
+  </div>
+
+  <div class="pshots">
+    <figure class="pshot" aria-labelledby="pshot-a-cap">
+      <div class="pshot-plate">
+        <p class="pshot-bar"><code>ectype report beijing-2013.dfp</code></p>
+        <img src="img/report-profile.webp" width="1600" height="1218" loading="lazy" decoding="async" alt="Six column cards from the profile report: TEMP, drawn as its gap above DEWP, and PRES as histograms with their medians marked, cbwd as bars of wind-direction shares, Iws with its point masses drawn apart from the curve, and Is and Ir, where one value holds most rows.">
+      </div>
+      <figcaption id="pshot-a-cap">Six of the <span data-r="profile.columns" data-f="int">12</span> column cards from the profile of a year of hourly air-quality readings in Beijing, <span data-r="profile.rows" data-f="int">8,760</span> rows (<span data-r="profile.source">UCI Beijing PM2.5, public, CC BY 4.0</span>). Every chart is redrawn from the fingerprint. <a href="example-report.html">Open the full report</a></figcaption>
+    </figure>
+    <figure class="pshot" aria-labelledby="pshot-b-cap">
+      <div class="pshot-plate">
+        <p class="pshot-bar"><code>ectype report beijing-2013.dfp beijing-2014.dfp</code></p>
+        <img src="img/report-comparison.webp" width="1600" height="1005" loading="lazy" decoding="async" alt="The comparison report’s “What changed” section: three column cards, TEMP, PRES and DEWP, each drawing 2013 as purple bars and 2014 as a teal outline on one axis, with the medians and middle halves of both years side by side.">
+      </div>
+      <figcaption id="pshot-b-cap">The same year against the next: <span data-r="profile.drifted_columns" data-f="int">3</span> of <span data-r="profile.columns" data-f="int">12</span> columns drifted, each drawn with both years on one axis. <a href="example-comparison.html">Open the comparison</a></figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 3. Head-to-head results. Numbers: data/compete.json via tools/update_data.py -->
+<section class="results" id="results" aria-labelledby="res-title">
+ <div class="cast">
+ <div class="cast-inner">
+  <div class="split-head">
+    <h2 id="res-title">Closer to real data than every deep-learning synthesizer we tested</h2>
+    <div>
+      <p>A head-to-head on <span data-r="compete.datasets" data-f="int">9</span> public datasets with <span data-r="compete.seeds" data-f="int">5</span> seeds each, every competitor at its library defaults, every score taken on held-out real rows that no method saw. Ectype at its defaults reaches a quality score of <span data-r="compete.derived.by_id.ectype.quality" data-f="mean3">0.975</span>; real data scored against real data reaches <span data-r="compete.derived.by_id.real-train.quality" data-f="mean3">0.981</span>.</p>
+      <p class="measured">Measured <time datetime="2026-11-27" data-r="compete.report_date" data-f="date">27 November 2026</time> on ectype <span data-r="compete.engine_version">0.1.0</span>.</p>
+    </div>
+  </div>
+
+  <dl class="h2h-stats">
+    <div><dt>Of <span data-r="compete.derived.ranked_count" data-f="int">10</span> methods on the classifier test, with a mean rank of <span data-r="compete.derived.by_id.ectype.mean_rank_classifier" data-f="mean1">2.6</span> across datasets</dt><dd><span data-r="compete.derived.default_rank" data-f="ordinal">2nd</span></dd></div>
+    <div><dt>Median fit, on a CPU. The deep-learning models need a GPU and <span data-r="compete.derived.deep_fit_minutes_range" data-f="range1">2.3 to 6.5</span> minutes.</dt><dd><span data-r="compete.derived.by_id.ectype.fit_seconds_median" data-f="mean0">10</span><span class="unit"> s</span></dd></div>
+    <div><dt>Of the real-data predictive score that models trained on Ectype’s rows keep (median)</dt><dd><span data-r="compete.derived.by_id.ectype.utility_median" data-f="pct1">97.8%</span></dd></div>
+    <div><dt>Highest membership-inference AUC on any dataset, where 0.5 is chance</dt><dd><span data-r="compete.derived.by_id.ectype.membership_auc_worst_dataset" data-f="mean3">0.508</span></dd></div>
+  </dl>
+
+  <figure class="h2h-fig" aria-labelledby="fig2-cap">
+    <p class="fig-title"><span class="fig-no">Fig. 2</span> How easily a classifier tells each method’s rows from real ones. Shorter bars pass for real data more often; at 0.5 the classifier is guessing.</p>
+    <div class="h2h" aria-hidden="true">
+<!-- bake:compete-chart -->
+<div class="h2h-axis"><span>Method</span><div class="h2h-ticks"><span>0.5</span><span>0.6</span><span>0.7</span><span>0.8</span><span>0.9</span><span>1.0</span></div><span>AUC</span></div>
+<div class="h2h-row"><span class="h2h-name">CART (sequential trees)<small>CPU, median fit 2 s</small></span><svg class="h2h-bar" viewBox="0 0 100 10" preserveAspectRatio="none" focusable="false"><path class="h2h-grid" d="M20 0V10M40 0V10M60 0V10M80 0V10"/><rect class="h2h-fill" x="0" y="1" width="19.2" height="8"/></svg><span class="h2h-val">0.596</span></div>
+<div class="h2h-row is-chain"><span class="h2h-name">Ectype<small>CPU, median fit 10 s</small></span><svg class="h2h-bar" viewBox="0 0 100 10" preserveAspectRatio="none" focusable="false"><path class="h2h-grid" d="M20 0V10M40 0V10M60 0V10M80 0V10"/><rect class="h2h-fill" x="0" y="1" width="40.0" height="8"/></svg><span class="h2h-val">0.700</span></div>
+<div class="h2h-row"><span class="h2h-name">Synthcity TabDDPM (diffusion)<small>GPU, median fit 6.4 min</small></span><svg class="h2h-bar" viewBox="0 0 100 10" preserveAspectRatio="none" focusable="false"><path class="h2h-grid" d="M20 0V10M40 0V10M60 0V10M80 0V10"/><rect class="h2h-fill" x="0" y="1" width="48.8" height="8"/></svg><span class="h2h-val">0.744</span></div>
+<div class="h2h-row"><span class="h2h-name">MOSTLY AI SDK (deep autoregressive)<small>GPU, median fit 2.3 min</small></span><svg class="h2h-bar" viewBox="0 0 100 10" preserveAspectRatio="none" focusable="false"><path class="h2h-grid" d="M20 0V10M40 0V10M60 0V10M80 0V10"/><rect class="h2h-fill" x="0" y="1" width="58.0" height="8"/></svg><span class="h2h-val">0.790</span></div>
+<div class="h2h-row"><span class="h2h-name">Ectype, forest model<small>CPU, median fit 18 s</small></span><svg class="h2h-bar" viewBox="0 0 100 10" preserveAspectRatio="none" focusable="false"><path class="h2h-grid" d="M20 0V10M40 0V10M60 0V10M80 0V10"/><rect class="h2h-fill" x="0" y="1" width="69.6" height="8"/></svg><span class="h2h-val">0.848</span></div>
+<div class="h2h-row"><span class="h2h-name">Ectype, fast<small>CPU, median fit 9 s</small></span><svg class="h2h-bar" viewBox="0 0 100 10" preserveAspectRatio="none" focusable="false"><path class="h2h-grid" d="M20 0V10M40 0V10M60 0V10M80 0V10"/><rect class="h2h-fill" x="0" y="1" width="82.4" height="8"/></svg><span class="h2h-val">0.912</span></div>
+<div class="h2h-row"><span class="h2h-name">ARF (adversarial random forest)<small>CPU, median fit 3.9 min</small></span><svg class="h2h-bar" viewBox="0 0 100 10" preserveAspectRatio="none" focusable="false"><path class="h2h-grid" d="M20 0V10M40 0V10M60 0V10M80 0V10"/><rect class="h2h-fill" x="0" y="1" width="88.2" height="8"/></svg><span class="h2h-val">0.941</span></div>
+<div class="h2h-row"><span class="h2h-name">SDV TVAE<small>GPU, median fit 2.9 min</small></span><svg class="h2h-bar" viewBox="0 0 100 10" preserveAspectRatio="none" focusable="false"><path class="h2h-grid" d="M20 0V10M40 0V10M60 0V10M80 0V10"/><rect class="h2h-fill" x="0" y="1" width="95.0" height="8"/></svg><span class="h2h-val">0.975</span></div>
+<div class="h2h-row"><span class="h2h-name">SDV CTGAN<small>GPU, median fit 6.5 min</small></span><svg class="h2h-bar" viewBox="0 0 100 10" preserveAspectRatio="none" focusable="false"><path class="h2h-grid" d="M20 0V10M40 0V10M60 0V10M80 0V10"/><rect class="h2h-fill" x="0" y="1" width="95.2" height="8"/></svg><span class="h2h-val">0.976</span></div>
+<div class="h2h-row"><span class="h2h-name">SDV Gaussian copula<small>CPU, median fit 6 s</small></span><svg class="h2h-bar" viewBox="0 0 100 10" preserveAspectRatio="none" focusable="false"><path class="h2h-grid" d="M20 0V10M40 0V10M60 0V10M80 0V10"/><rect class="h2h-fill" x="0" y="1" width="98.8" height="8"/></svg><span class="h2h-val">0.994</span></div>
+<div class="h2h-row is-ref"><span class="h2h-name">Real data (ceiling)<small>reference</small></span><svg class="h2h-bar" viewBox="0 0 100 10" preserveAspectRatio="none" focusable="false"><path class="h2h-grid" d="M20 0V10M40 0V10M60 0V10M80 0V10"/><rect class="h2h-tick" x="0.0" y="0" width="1.2" height="10"/></svg><span class="h2h-val">0.499</span></div>
+<div class="h2h-row is-ref"><span class="h2h-name">Independent columns (baseline)<small>reference</small></span><svg class="h2h-bar" viewBox="0 0 100 10" preserveAspectRatio="none" focusable="false"><path class="h2h-grid" d="M20 0V10M40 0V10M60 0V10M80 0V10"/><rect class="h2h-tick" x="95.8" y="0" width="1.2" height="10"/></svg><span class="h2h-val">0.982</span></div>
+<!-- /bake:compete-chart -->
+    </div>
+    <figcaption id="fig2-cap">
+      <span class="fig-no">Fig. 2.</span> Mean ROC AUC of a gradient-boosted classifier separating synthetic rows from held-out real rows, over <span data-r="compete.datasets" data-f="int">9</span> datasets and <span data-r="compete.seeds" data-f="int">5</span> seeds, with Ectype on a CPU and the deep-learning models on a GPU; the table below lists the same values. Ectype’s default model was tuned on <span data-r="compete.derived.tuned.count" data-f="int">2</span> of the <span data-r="compete.datasets" data-f="int">9</span> datasets (<span data-r="compete.derived.tuned.names">Adult and Credit Default</span>). The diffusion model failed on <span data-r="compete.derived.by_id.synthcity-ddpm.runs_failed" data-f="int">2</span> of its <span data-r="compete.derived.runs_per_method" data-f="int">45</span> runs.
+    </figcaption>
+  </figure>
+ </div>
+ </div>
+
+ <div class="results-rest">
+  <div class="h2h-notes">
+    <p>First place on the classifier test goes to sequential trees (CART), on all <span data-r="compete.derived.leader.wins" data-f="int">9</span> datasets. Each value they emit is sampled from a real training row, and they have the highest worst-case membership-inference score of any method tested: <span data-r="compete.derived.leader.membership_auc_worst_dataset" data-f="mean3">0.533</span>, against <span data-r="compete.derived.by_id.ectype.membership_auc_worst_dataset" data-f="mean3">0.508</span> for Ectype.</p>
+    <p>Beyond the benchmark, Ectype runs on <span data-r="robustness.tables" data-f="int">29</span> further public government, health and finance tables, from <span data-r="robustness.rows_min" data-f="int">184</span> rows to <span data-r="robustness.rows_max" data-f="int">60,000</span>-row samples and up to <span data-r="robustness.columns_max" data-f="int">287</span> columns, with no failures.</p>
+  </div>
+
+  <details class="h2h-more">
+  <summary><span id="h2h-cap-t">Every method side by side</span><span class="sum-hint">classifier AUC, rank, quality, utility, membership AUC, fit time and hardware</span></summary>
+  <p class="table-note" id="h2h-cap">Classifier AUC and quality are means over <span data-r="compete.datasets" data-f="int">9</span> datasets and <span data-r="compete.seeds" data-f="int">5</span> seeds, utility is the median share of the real-data score kept, and membership AUC is the worst single dataset. Lower is better for classifier AUC, rank and membership AUC. The real-data row is the training split scored as if it were synthetic: it marks each metric’s best value and shows that the attack catches copied rows. “Ectype” is the default, <code>ectype.fit(df)</code> with nothing passed; a row named “Ectype, …” changes one setting, such as <code>effort="fast"</code>.</p>
+    <div class="table-scroll" tabindex="0" role="region" aria-labelledby="h2h-cap-t">
+      <table class="h2h-table">
+        <caption class="sr-only">Every method in the head-to-head, with classifier AUC, mean rank, quality, utility, worst-case membership AUC, median fit time and hardware</caption>
+        <thead><tr><th scope="col">Method</th><th scope="col">Classifier AUC</th><th scope="col">Mean rank</th><th scope="col">Quality</th><th scope="col">Utility kept</th><th scope="col">Membership AUC, worst dataset</th><th scope="col">Median fit</th><th scope="col">Hardware</th></tr></thead>
+        <tbody>
+<!-- bake:compete-table -->
+<tr><th scope="row">CART (sequential trees)</th><td>0.596</td><td>1.0</td><td>0.980</td><td>98.3%</td><td>0.533</td><td>2 s</td><td>CPU</td></tr>
+<tr class="is-chain"><th scope="row">Ectype</th><td>0.700</td><td>2.6</td><td>0.975</td><td>97.8%</td><td>0.508</td><td>10 s</td><td>CPU</td></tr>
+<tr><th scope="row">Synthcity TabDDPM (diffusion)</th><td>0.744</td><td>3.4</td><td>0.908</td><td>97.3%</td><td>0.505</td><td>6.4 min</td><td>GPU</td></tr>
+<tr><th scope="row">MOSTLY AI SDK (deep autoregressive)</th><td>0.790</td><td>3.7</td><td>0.966</td><td>96.3%</td><td>0.507</td><td>2.3 min</td><td>GPU</td></tr>
+<tr><th scope="row">Ectype, forest model</th><td>0.848</td><td>5.5</td><td>0.960</td><td>93.0%</td><td>0.505</td><td>18 s</td><td>CPU</td></tr>
+<tr><th scope="row">Ectype, fast</th><td>0.912</td><td>6.6</td><td>0.958</td><td>91.1%</td><td>0.503</td><td>9 s</td><td>CPU</td></tr>
+<tr><th scope="row">ARF (adversarial random forest)</th><td>0.941</td><td>6.8</td><td>0.922</td><td>97.0%</td><td>0.517</td><td>3.9 min</td><td>CPU</td></tr>
+<tr><th scope="row">SDV TVAE</th><td>0.975</td><td>8.0</td><td>0.896</td><td>89.9%</td><td>0.505</td><td>2.9 min</td><td>GPU</td></tr>
+<tr><th scope="row">SDV CTGAN</th><td>0.976</td><td>8.1</td><td>0.882</td><td>88.5%</td><td>0.505</td><td>6.5 min</td><td>GPU</td></tr>
+<tr><th scope="row">SDV Gaussian copula</th><td>0.994</td><td>9.3</td><td>0.869</td><td>86.8%</td><td>0.506</td><td>6 s</td><td>CPU</td></tr>
+<tr class="is-ref"><th scope="row">Real data (ceiling)</th><td>0.499</td><td>–</td><td>0.981</td><td>100.0%</td><td>0.749</td><td>–</td><td>–</td></tr>
+<tr class="is-ref"><th scope="row">Independent columns (baseline)</th><td>0.982</td><td>–</td><td>0.867</td><td>51.1%</td><td>0.505</td><td>8 s</td><td>CPU</td></tr>
+<!-- /bake:compete-table -->
+        </tbody>
+      </table>
+    </div>
+  </details>
+  <p class="source">Every number, every method and every dataset, including where others lead, is in <a data-site="compete" href="https://github.com/EctypeHQ/ectype/blob/main/docs/results/compete.md">the report</a>.</p>
+ </div>
+</section>
+
+<!-- 4. Evidence: the specimen figure (Fig. 3) -->
+<section class="evidence" id="evidence" aria-labelledby="ev-title">
+  <div class="split-head">
+    <h2 id="ev-title">Same columns, different print</h2>
+    <div>
+      <p>Ectype and the independent-columns baseline share the same fitted model of each column, so one column at a time they look alike. The difference is how the columns move together: payment status this month and last, one bill and the next. Fig. 3 shows all of those pairs at once.</p>
+    </div>
+  </div>
+
+  <figure class="specimen" id="fig3" aria-labelledby="fig3-cap">
+    <div class="spec-head">
+      <p class="fig-title"><span class="fig-no">Fig. 3</span> Rank correlation (Spearman ρ) between all <span data-r="demo.dataset.columns" data-f="int">24</span> columns of UCI Credit Default</p>
+      <fieldset class="switch live">
+        <legend>Panel b shows</legend>
+        <label><input type="radio" name="fig2-cmp" value="ectype" checked><span>Ectype rows</span></label>
+        <label><input type="radio" name="fig2-cmp" value="independent"><span>Independent columns</span></label>
+        <label><input type="radio" name="fig2-cmp" value="real"><span>Real rows (control)</span></label>
+      </fieldset>
+    </div>
+
+    <div class="spec-body live">
+      <div class="matrices">
+        <p class="panel-label la"><b>a</b> Held-out real rows</p>
+        <ol class="groups" aria-hidden="true"></ol>
+        <div class="mat ma" id="mat-a"></div>
+        <p class="panel-label lb"><b>b</b> <span id="b-label">Ectype synthetic rows</span></p>
+        <div class="mat mb" id="mat-b" tabindex="0" role="application" aria-roledescription="correlation matrix" aria-label="Panel b. Use the arrow keys to move between cells; Home, End, Page Up and Page Down jump to an edge." aria-describedby="readout"></div>
+      </div>
+
+      <div class="spec-side">
+        <div class="key">
+          <svg id="scale" viewBox="0 0 220 34" aria-hidden="true" focusable="false"></svg>
+          <p>Colour shows ρ from −1 (rose) through 0 (white) to +1 (teal); hatching marks ρ at or below −0.15, so the sign never rests on colour alone. Both panels list the columns in the same order, top to bottom and left to right.</p>
+        </div>
+        <p class="readout" id="readout" aria-live="polite">Point at a cell, or tab to panel b and use the arrow keys, to read both values.</p>
+        <ol class="notes" id="notes" aria-label="Annotations"></ol>
+      </div>
+
+      <div class="hists" id="hists"></div>
+    </div>
+
+    <noscript><img class="snapshot" src="img/fig2.png" width="1142" height="768" alt="Two 24 by 24 correlation matrices, real rows and Ectype rows, with nearly identical teal blocks for repayment status and bill amounts, and four matching histograms."></noscript>
+
+    <figcaption id="fig3-cap">
+      <p class="status" data-status hidden></p>
+      <span class="fig-no">Fig. 3.</span> Real output of ectype <span data-r="demo.engine.version">0.1.0</span> on the public UCI Default of Credit Card Clients table (CC BY 4.0), fitted on <span data-r="demo.dataset.rows_train" data-f="int">24,000</span> rows with the default settings (the chain model). <b>a</b>, <span data-r="demo.dataset.rows_holdout" data-f="int">6,000</span> real rows the profiler never saw. <b>b</b>, the same number of generated rows; the independent-columns baseline uses the same column models with no dependence, and the control shows the real rows again. Markers 1–3 are the annotated blocks; their mean ρ recomputes when panel b changes. <b>c–f</b>, marginal histograms: the purple outline is real, the bars are panel b, and TV is total-variation distance (0 means identical). One run; Fig. 2 covers <span data-r="compete.datasets" data-f="int">9</span> datasets and <span data-r="compete.seeds" data-f="int">5</span> seeds.
+    </figcaption>
+  </figure>
+</section>
+
+<!-- 5. Differentiators -->
+<section class="marks" id="features" aria-labelledby="marks-title">
+  <div class="split-head">
+    <h2 id="marks-title">What makes the match trustworthy</h2>
+    <div><p>Ectype tests its own rows against evidence held back from the generator, replaces personal details by default, and keeps the rules your data obeys on every generated row. These details are to Ectype what minutiae are to a print: what make a match one you can rely on.</p></div>
+  </div>
+
+  <div class="mark-lead">
+    <h3>Sealed evidence</h3>
+    <p>Every fingerprint splits its measurements in two. Calibration targets are what the optimizer sees. Sealed targets are hash-committed when you fit and opened only by the validator, so a pass on them is evidence the generator could not have tuned for. The verdict allows for chance: a sealed target fails when it misses by more than sampling noise explains, with the false discovery rate controlled at q = <span data-r="validation.fdr_q" data-f="mean2">0.05</span> across all targets.</p>
+  </div>
+
+  <figure class="report" aria-labelledby="report-cap">
+    <div class="term term-report">
+      <p class="term-bar"><span>ectype validate customers.dfp synthetic.parquet --html report.html</span></p>
+<pre tabindex="0" aria-label="Validation summary from the session above, which passes"><code>Validation <span class="pass">PASSED</span>  fingerprint 19f9bc3d9701  policy=standard  rows=5000
+  structural   5/5 checks ok
+  constraints  1/1 hard constraints satisfied
+  <span class="dim">calibration  44/46 passed (95.7%) (optimizer evidence only)</span><span class="mk" aria-hidden="true">1</span>
+  <span class="lit">sealed       39/40 passed (97.5%) (primary evidence of fidelity)</span><span class="mk" aria-hidden="true">2</span>
+               <span class="lit">0 failed beyond sampling noise (sensitivity standard, FDR q=0.05)</span><span class="mk" aria-hidden="true">3</span>
+  calibration - sealed pass-rate gap: -1.8 pts<span class="mk" aria-hidden="true">4</span>
+<span class="dim">    worst calibration: bivariate.spearman:income|unit_price  d=0.08688 tol=0.06108
+    worst calibration: bivariate.spearman:age|unit_price  d=0.08874 tol=0.07828</span>
+    worst sealed: bivariate.kendall:income|unit_price  d=0.05335 tol=0.05<span class="mk" aria-hidden="true">5</span>
+RESULT: <span class="pass">PASSED</span></code></pre>
+    </div>
+    <ol class="report-notes" aria-label="How to read the report">
+      <li><b>Calibration</b> is what the optimizer fitted to. It is reported, and it never decides the result.</li>
+      <li><b>Sealed</b> targets are opened from the seal. With the structural checks and hard constraints, they decide the result.</li>
+      <li>One sealed target missed its tolerance, but by less than sampling noise explains, so the report passes.</li>
+      <li>The gap is the calibration pass rate minus the sealed one. A large positive gap means the model meets what it was tuned on but not what was held back.</li>
+      <li>That one miss: <code>d</code> is the distance between the generated rows and the sealed measurement, <code>tol</code> the distance allowed.</li>
+    </ol>
+    <figcaption id="report-cap">The summary <code>ectype validate</code> printed in the session above.</figcaption>
+  </figure>
+
+  <div class="mark-lead">
+    <h3>Personal details replaced by default</h3>
+    <p>Ectype recognises columns of names, phone numbers, email addresses and address lines, and replaces each value with a consistent stand-in: the same customer gets the same stand-in every time, so repeat customers stay repeat customers and no real name appears. Unique keys are regenerated, never copied, and keys that point to another record come out as fresh keys with the source’s repeat pattern. On a real <span data-r="pii.table_rows" data-f="million1">2.4 million</span>-row public-records table, no synthetic row carried a real name or phone number.</p>
+  </div>
+
+  <ul class="mark-list">
+    <li>
+      <h3>A disclosure policy on every fit</h3>
+      <p>Each fingerprint is fitted under <code>strict</code>, <code>standard</code> or <code>research</code>. The policy pools rare categories, coarsens quantiles and keeps exact extremes out. A built-in attack suite runs membership inference, distance to closest record and attribute inference against null distributions. Policies reduce risk. The suite’s scores are measured attack results on generated data, not a formal guarantee such as differential privacy.</p>
+    </li>
+    <li>
+      <h3>A file that cannot run code</h3>
+      <p>No pickle and no <code>eval</code>. Loading a <code>.dfp</code> never executes anything, and a published JSON Schema lets any language read it.</p>
+    </li>
+    <li>
+      <h3>Drift detection without generating</h3>
+      <p>Compare last month’s fingerprint with this month’s and see which columns and pairs moved beyond sampling noise. An inconclusive comparison never passes as “no drift”, and <code>ectype compare --fail-on-drift</code> drops into CI.</p>
+    </li>
+    <li>
+      <h3>Relationships found and held</h3>
+      <p>Ectype finds the structure in a table and builds it into every row: dates stay in order, computed columns such as a weekday or <code>total = qty * price</code> are computed, parts add up to their total, a repeated customer keeps the same attributes, and dates keep their weekly pattern. Declare rules such as <code>start &lt;= end</code> yourself, or confirm the ones it suggests, and they hold on every generated row.</p>
+    </li>
+    <li>
+      <h3>Time series and multi-table</h3>
+      <p>Trend, seasonality and autoregressive models, panels of entities and event streams. Multi-table schemas keep <span data-r="claims.referential_integrity_pct" data-f="int">100</span>% referential integrity.</p>
+    </li>
+    <li>
+      <h3>Fully local</h3>
+      <p>Fit, generate and validate on a laptop, in CI or on an air-gapped server, with no cloud, GPU or LLM. A <span data-r="scale.rows" data-f="million1">2.4 million</span>-row, <span data-r="scale.columns" data-f="int">78</span>-column table fits on a desktop CPU.</p>
+    </li>
+  </ul>
+</section>
+
+<!-- 6. Uses, by industry and by job. Source: ectype/docs/use-cases.md -->
+<section class="uses" id="uses" aria-labelledby="uses-title">
+  <div class="split-head">
+    <h2 id="uses-title">What people use it for</h2>
+    <div>
+      <p>Anywhere real data is needed but hard to use: it is locked down, it holds personal details, there is not enough of it, or it does not exist yet. Everything listed here works with the current release.</p>
+    </div>
+  </div>
+
+  <fieldset class="switch uses-switch">
+    <legend>Show uses</legend>
+    <label><input type="radio" name="uses-view" value="industry" checked><span>By industry</span></label>
+    <label><input type="radio" name="uses-view" value="job"><span>By the job to be done</span></label>
+  </fieldset>
+
+  <div class="uses-part uses-industry" id="uses-industry" data-part="industry">
+    <h3 class="uses-part-title">By industry</h3>
+    <ul class="uses-index" aria-label="Industries">
+      <li><a href="#use-banking" aria-controls="use-banking">Banking and payments</a></li>
+      <li><a href="#use-insurance" aria-controls="use-insurance">Insurance</a></li>
+      <li><a href="#use-health" aria-controls="use-health">Healthcare and life sciences</a></li>
+      <li><a href="#use-retail" aria-controls="use-retail">Retail and e-commerce</a></li>
+      <li><a href="#use-telecom" aria-controls="use-telecom">Telecommunications</a></li>
+      <li><a href="#use-manufacturing" aria-controls="use-manufacturing">Manufacturing and industrial</a></li>
+      <li><a href="#use-energy" aria-controls="use-energy">Energy and utilities</a></li>
+      <li><a href="#use-logistics" aria-controls="use-logistics">Logistics and transportation</a></li>
+      <li><a href="#use-government" aria-controls="use-government">Government and public sector</a></li>
+      <li><a href="#use-education" aria-controls="use-education">Education and academic research</a></li>
+      <li><a href="#use-hr" aria-controls="use-hr">Human resources and workforce</a></li>
+      <li><a href="#use-marketing" aria-controls="use-marketing">Marketing, advertising and customer analytics</a></li>
+      <li><a href="#use-saas" aria-controls="use-saas">Software and SaaS</a></li>
+      <li><a href="#use-security" aria-controls="use-security">Cybersecurity and IT operations</a></li>
+      <li><a href="#use-realestate" aria-controls="use-realestate">Real estate and construction</a></li>
+      <li><a href="#use-nonprofit" aria-controls="use-nonprofit">Nonprofits and international development</a></li>
+    </ul>
+    <div class="uses-groups">
+      <div class="use-group" id="use-banking">
+        <h4>Banking and payments</h4>
+        <ul>
+          <li>Transaction tables for testing fraud rules and monitoring systems.</li>
+          <li>Customer and account tables for building onboarding and servicing software.</li>
+          <li>Loan applications for developing and explaining credit models before production access.</li>
+          <li>Month-over-month drift checks on feeds from core systems.</li>
+        </ul>
+      </div>
+      <div class="use-group" id="use-insurance">
+        <h4>Insurance</h4>
+        <ul>
+          <li>Policy and claims tables for pricing and reserving prototypes.</li>
+          <li>Claims histories with realistic delays between events, for workflow testing.</li>
+          <li>Shareable samples for reinsurers, brokers and actuarial consultants.</li>
+        </ul>
+      </div>
+      <div class="use-group" id="use-health">
+        <h4>Healthcare and life sciences</h4>
+        <ul>
+          <li>Encounter, claims and billing tables for building and testing health IT systems.</li>
+          <li>Lifelike tables for teaching clinical coding, analytics and epidemiology.</li>
+          <li>Trial-style tables for designing analyses and checking pipelines before unblinding.</li>
+          <li>Hospital operations data (admissions, bed use, waiting times) for capacity planning tools.</li>
+        </ul>
+      </div>
+      <div class="use-group" id="use-retail">
+        <h4>Retail and e-commerce</h4>
+        <ul>
+          <li>Orders, baskets and returns for testing recommendation, pricing and promotion systems.</li>
+          <li>Store-by-day sales series for trying forecasting methods.</li>
+          <li>Customer tables for building loyalty and segmentation tools without real customers.</li>
+          <li>Supplier and inventory tables for testing replenishment logic at scale.</li>
+        </ul>
+      </div>
+      <div class="use-group" id="use-telecom">
+        <h4>Telecommunications</h4>
+        <ul>
+          <li>Call and usage records for billing and rating tests.</li>
+          <li>Subscriber tables for churn analysis prototypes.</li>
+          <li>Network event streams for testing alerting and capacity tools.</li>
+        </ul>
+      </div>
+      <div class="use-group" id="use-manufacturing">
+        <h4>Manufacturing and industrial</h4>
+        <ul>
+          <li>Sensor and machine logs for testing monitoring and maintenance software.</li>
+          <li>Quality inspection tables for process-control dashboards.</li>
+          <li>Production orders and bills of materials for planning-system tests.</li>
+        </ul>
+      </div>
+      <div class="use-group" id="use-energy">
+        <h4>Energy and utilities</h4>
+        <ul>
+          <li>Meter readings for billing, forecasting and demand-response prototypes.</li>
+          <li>Outage and work-order tables for field-service software.</li>
+          <li>Customer tables for tariff and affordability analysis.</li>
+        </ul>
+      </div>
+      <div class="use-group" id="use-logistics">
+        <h4>Logistics and transportation</h4>
+        <ul>
+          <li>Shipments, routes and delivery events for testing tracking and planning systems.</li>
+          <li>Fleet and maintenance records for scheduling tools.</li>
+          <li>Trip and ridership tables for demand analysis.</li>
+        </ul>
+      </div>
+      <div class="use-group" id="use-government">
+        <h4>Government and public sector</h4>
+        <ul>
+          <li>Permits, inspections, licences and service requests for building citizen-facing systems.</li>
+          <li>Shareable versions of administrative tables for policy analysis and open-data previews.</li>
+          <li>Benefit and case-management tables for testing eligibility rules.</li>
+          <li>Procurement and spending tables for audit-tool development.</li>
+        </ul>
+      </div>
+      <div class="use-group" id="use-education">
+        <h4>Education and academic research</h4>
+        <ul>
+          <li>Teaching datasets for statistics, data science and econometrics courses.</li>
+          <li>Student-record tables for testing learning-management and reporting systems.</li>
+          <li>Companion data for publications when the original cannot be released.</li>
+          <li>Replication exercises: many datasets with the same known structure.</li>
+        </ul>
+      </div>
+      <div class="use-group" id="use-hr">
+        <h4>Human resources and workforce</h4>
+        <ul>
+          <li>Employee and payroll tables for testing HR and payroll software.</li>
+          <li>Hiring pipelines for analytics prototypes.</li>
+          <li>Workforce planning scenarios: change turnover or headcount mix and see the effect.</li>
+        </ul>
+      </div>
+      <div class="use-group" id="use-marketing">
+        <h4>Marketing, advertising and customer analytics</h4>
+        <ul>
+          <li>Campaign and event tables for building attribution and reporting tools.</li>
+          <li>Survey responses for testing analysis scripts before fieldwork ends.</li>
+          <li>Customer journeys for demo dashboards.</li>
+        </ul>
+      </div>
+      <div class="use-group" id="use-saas">
+        <h4>Software and SaaS</h4>
+        <ul>
+          <li>Seed data for product demos, trials and sandboxes.</li>
+          <li>Tenant-shaped test data for multi-customer platforms.</li>
+          <li>Usage and billing tables for metering tests.</li>
+        </ul>
+      </div>
+      <div class="use-group" id="use-security">
+        <h4>Cybersecurity and IT operations</h4>
+        <ul>
+          <li>Log and event tables for testing detection rules and dashboards.</li>
+          <li>Asset and access inventories for training exercises.</li>
+          <li>Incident tickets for tooling and reporting prototypes.</li>
+        </ul>
+      </div>
+      <div class="use-group" id="use-realestate">
+        <h4>Real estate and construction</h4>
+        <ul>
+          <li>Listings, permits and inspections for market-analysis tools.</li>
+          <li>Project cost and schedule tables for estimating software.</li>
+          <li>Contractor and bid tables for procurement systems.</li>
+        </ul>
+      </div>
+      <div class="use-group" id="use-nonprofit">
+        <h4>Nonprofits and international development</h4>
+        <ul>
+          <li>Beneficiary and programme tables for building case-management tools.</li>
+          <li>Survey microdata for training analysts.</li>
+          <li>Donor and grant tables for reporting systems.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="uses-part uses-job" id="uses-job" data-part="job">
+    <h3 class="uses-part-title">By the job to be done</h3>
+    <ul class="uses-index" aria-label="Jobs to be done">
+      <li><a href="#use-build" aria-controls="use-build">Build and test software</a></li>
+      <li><a href="#use-models" aria-controls="use-models">Develop analytics and models</a></li>
+      <li><a href="#use-share" aria-controls="use-share">Share data across a boundary</a></li>
+      <li><a href="#use-change" aria-controls="use-change">Watch for change</a></li>
+      <li><a href="#use-whatif" aria-controls="use-whatif">Explore what could happen</a></li>
+      <li><a href="#use-teach" aria-controls="use-teach">Teach, demonstrate and sell</a></li>
+    </ul>
+    <div class="uses-groups">
+      <div class="use-group" id="use-build">
+        <h4>Build and test software</h4>
+        <ul>
+          <li><b>Realistic test databases.</b> Fill a development or staging database with rows that have the shapes, ranges, empty cells and odd cases of production, without copying production.</li>
+          <li><b>Load and performance tests.</b> Generate ten or a thousand times your current volume to see where queries, pipelines and dashboards slow down.</li>
+          <li><b>Migration rehearsals.</b> Run a schema change or a platform move against lifelike data before touching the real thing.</li>
+          <li><b>Reproducible bug reports.</b> Share a table that triggers the problem instead of a customer’s data.</li>
+          <li><b>Continuous integration.</b> Keep a small fingerprint file in the repository and generate fresh test data on every run. The same seed gives the same rows.</li>
+        </ul>
+      </div>
+      <div class="use-group" id="use-models">
+        <h4>Develop analytics and models</h4>
+        <ul>
+          <li><b>Prototype before access is granted.</b> Start building features, queries and dashboards while the request for the real data is still in review.</li>
+          <li><b>Share a working sample</b> with a contractor or vendor so they can build against the right structure.</li>
+          <li><b>Notebook and tutorial data.</b> Publish examples that run for everyone, on data that looks like the real problem.</li>
+          <li><b>Benchmark methods fairly.</b> Generate many independent datasets from the same fingerprint to see how stable a method is.</li>
+        </ul>
+      </div>
+      <div class="use-group" id="use-share">
+        <h4>Share data across a boundary</h4>
+        <ul>
+          <li><b>Between teams</b> that are not all cleared for the raw records.</li>
+          <li><b>With partners, auditors or regulators</b> who need to understand the data’s structure.</li>
+          <li><b>With researchers and students,</b> as a companion to a paper or a course.</li>
+          <li><b>Across regions</b> where the raw records must stay where they are. The fingerprint is a small file of statistics, not rows.</li>
+        </ul>
+      </div>
+      <div class="use-group" id="use-change">
+        <h4>Watch for change</h4>
+        <ul>
+          <li><b>Drift detection.</b> Compare this month’s fingerprint with last month’s to see which columns and relationships moved, without storing or re-reading either month’s rows.</li>
+          <li><b>Pipeline checks.</b> Fail a build when an upstream feed changes shape.</li>
+          <li><b>Vendor data acceptance.</b> Check a new delivery against the fingerprint of the last good one.</li>
+        </ul>
+      </div>
+      <div class="use-group" id="use-whatif">
+        <h4>Explore what could happen</h4>
+        <ul>
+          <li><b>What-if scenarios.</b> Shift an average, widen a spread, strengthen a relationship or mix two populations, then generate data for that world. You can also describe the change in plain English: a model drafts the request for you to review, and nothing runs until you apply it (the optional <code>ectype-data[llm]</code> extra; a simple offline drafter is built in).</li>
+          <li><b>Stress cases.</b> Produce more of the rare situations a system must survive.</li>
+          <li><b>Planning for a launch.</b> Describe a table that does not exist yet from a specification and generate data for it, so work can start before the first real record arrives.</li>
+        </ul>
+      </div>
+      <div class="use-group" id="use-teach">
+        <h4>Teach, demonstrate and sell</h4>
+        <ul>
+          <li><b>Product demos</b> with data that looks like the customer’s industry.</li>
+          <li><b>Training environments</b> for new staff, with no risk of exposing a real customer.</li>
+          <li><b>Classroom datasets</b> with realistic mess: missing values, skew, coded categories.</li>
+          <li><b>Hackathons and competitions</b> on data that can be handed out freely.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <p class="uses-limits">Ectype works on tables. What it does not do is listed in <a data-site="usecases" href="https://github.com/EctypeHQ/ectype/blob/main/docs/use-cases.md">the docs</a>.</p>
+</section>
+
+<!-- 6b. Works with AI agents: a recorded ectype-mcp session, replayed. The transcript(s), the
+     caption, the "Tested with" line, the tool list and the release status are baked from
+     data/mcp-session.json and data/mcp.json by tools/update_data.py; js/agents.js only animates
+     what is already here. -->
+<section class="agents" id="agents" aria-labelledby="agents-title">
+  <div class="split-head">
+    <h2 id="agents-title">Give your agent a data tool</h2>
+    <div>
+      <p>An agent that needs a table usually improvises one from random numbers. With Ectype’s MCP server, coming next as a separate package, it describes the table once, in a short spec, and gets back rows whose rules hold on every row, a fingerprint for more, and a check of what came out against what was asked. It runs on your machine. Until it ships, an agent can call the library and the command line from its shell.</p>
+    </div>
+  </div>
+
+  <div class="agents-body">
+    <div class="agents-demo">
+    <figure class="session-replay" id="replay" aria-labelledby="replay-cap">
+      <div class="replay-bar live">
+        <p class="replay-title">A recorded session</p>
+        <div class="replay-controls">
+          <button type="button" class="rbtn" data-replay-next aria-describedby="replay-keys">Next step</button>
+          <button type="button" class="rbtn" data-replay-end>Skip to the end</button>
+          <button type="button" class="rbtn" data-replay-again>Replay</button>
+        </div>
+        <p class="sr-only" id="replay-keys">While the transcript has focus, the right or down arrow shows the next step.</p>
+      </div>
+<!-- bake:mcp-demo -->
+<fieldset class="switch session-switch"><legend>Recorded in</legend><label><input type="radio" name="replay-session" value="0" checked><span>Claude Code</span></label><label><input type="radio" name="replay-session" value="1"><span>MCP SDK client</span></label></fieldset>
+<p class="session-label" data-session-label="0">Recorded in Claude Code</p>
+<ol class="transcript" data-session="0" tabindex="0" aria-label="Transcript: a person asks an agent for a table, and the agent calls the Ectype MCP server once, recorded in Claude Code">
+<li class="turn you" data-step="say"><p class="who">You</p><p class="said">I'm building a churn dashboard for a gym and need test data. Make me 2,000 synthetic memberships in gym-members.csv: a unique member id, plan (60% basic, 30% plus, 10% premium), a join date in 2025, monthly visits averaging about 8, and a monthly fee set by the plan (basic 25, plus 45, premium 80). How well does the result match what I asked for?</p></li>
+<li class="turn call" data-step="call"><p class="who">Tool call</p><div class="card call-card"><p class="card-name"><code><span data-r="mcp.sessions.0.steps.0.tool">create_table_from_spec</span></code></p><p class="args"><span class="arg"><span class="k">output_path</span> <span class="s">&quot;gym-members.csv&quot;</span></span><span class="arg"><span class="k">rows</span> <span data-r="mcp.sessions.0.steps.0.arguments.rows" data-f="int">2,000</span></span><span class="arg"><span class="k">spec</span> <span data-r="mcp.sessions.0.derived.spec_columns">4</span> columns, <span data-r="mcp.sessions.0.derived.spec_derived">1</span> derived</span></p><details class="spec"><summary>Show the full spec</summary><pre tabindex="0"><code>{
+ &quot;name&quot;: &quot;gym_members&quot;,
+ &quot;columns&quot;: [
+  {&quot;name&quot;: &quot;member_id&quot;, &quot;type&quot;: &quot;identifier&quot;, &quot;kind&quot;: &quot;int_sequence&quot;},
+  {
+   &quot;name&quot;: &quot;plan&quot;,
+   &quot;type&quot;: &quot;categorical&quot;,
+   &quot;probs&quot;: {
+    &quot;basic&quot;: 0.6,
+    &quot;plus&quot;: 0.3,
+    &quot;premium&quot;: 0.1
+   }
+  },
+  {&quot;name&quot;: &quot;join_date&quot;, &quot;type&quot;: &quot;datetime&quot;, &quot;start&quot;: &quot;2025-01-01&quot;, &quot;end&quot;: &quot;2025-12-31&quot;},
+  {&quot;name&quot;: &quot;monthly_visits&quot;, &quot;type&quot;: &quot;numeric&quot;, &quot;dist&quot;: &quot;negbinom&quot;, &quot;mean&quot;: 8, &quot;r&quot;: 4}
+ ],
+ &quot;derived&quot;: {
+  &quot;monthly_fee&quot;: {
+   &quot;expression&quot;: &quot;lookup(plan, &#x27;basic&#x27;, 25, &#x27;plus&#x27;, 45, &#x27;premium&#x27;, 80)&quot;,
+   &quot;dtype&quot;: &quot;Int64&quot;
+  }
+ }
+}</code></pre></details></div></li>
+<li class="turn result" data-step="result"><p class="who">Result</p><div class="card result-card"><p class="card-name"><code>spec_status</code> <b class="verdict"><span data-r="mcp.sessions.0.steps.0.result.spec_status">matches</span></b></p><table class="checks"><caption class="sr-only">Each column and correlation: what the spec asked for and what the rows have</caption><thead><tr><th scope="col">Checked</th><th scope="col">Asked</th><th scope="col">Got</th><th scope="col"><span class="sr-only">Match</span></th></tr></thead><tbody><tr data-step="check"><th scope="row"><code><span data-r="mcp.sessions.0.steps.0.result.checks.0.item">member_id</span></code></th><td><span data-r="mcp.sessions.0.steps.0.result.checks.0.asked">unique int_sequence</span></td><td><span data-r="mcp.sessions.0.steps.0.result.checks.0.got">2000 unique of 2000</span></td><td class="ok"><span class="sr-only">matches</span></td></tr><tr data-step="check"><th scope="row"><code><span data-r="mcp.sessions.0.steps.0.result.checks.1.item">plan</span></code></th><td><span data-r="mcp.sessions.0.steps.0.result.checks.1.asked">basic 0.6, plus 0.3, premium 0.1</span></td><td><span data-r="mcp.sessions.0.steps.0.result.checks.1.got">basic 0.601, plus 0.308, premium 0.091</span></td><td class="ok"><span class="sr-only">matches</span></td></tr><tr data-step="check"><th scope="row"><code><span data-r="mcp.sessions.0.steps.0.result.checks.2.item">join_date</span></code></th><td><span data-r="mcp.sessions.0.steps.0.result.checks.2.asked">spread evenly 2025-01-01 to 2025-12-31</span></td><td><span data-r="mcp.sessions.0.steps.0.result.checks.2.got">2025-01-02 to 2025-12-31, median 2025-07-04</span></td><td class="ok"><span class="sr-only">matches</span></td></tr><tr data-step="check"><th scope="row"><code><span data-r="mcp.sessions.0.steps.0.result.checks.3.item">monthly_visits</span></code></th><td><span data-r="mcp.sessions.0.steps.0.result.checks.3.asked">negbinom mean 8, sd 4.9</span></td><td><span data-r="mcp.sessions.0.steps.0.result.checks.3.got">mean 7.98, sd 4.8</span></td><td class="ok"><span class="sr-only">matches</span></td></tr></tbody></table><p class="verdict-line" data-step="verdict"><span data-r="mcp.sessions.0.steps.0.result.summary">Wrote 2,000 rows to gym-members.csv and the fingerprint to gym-members.dfp. All 4 checks match the spec. Validation passed.</span></p></div></li>
+<li class="turn agent" data-step="say"><p class="who">Agent</p><p class="said">I wrote 2,000 rows to <code>gym-members.csv</code>. Everything the generator reports matches what you asked for, within normal sampling noise. Plan mix: basic 60.1%, plus 30.8%, premium 9.1%. Monthly visits: mean 7.98.</p></li>
+</ol>
+<p class="session-label" data-session-label="1">Recorded in MCP SDK client</p>
+<ol class="transcript" data-session="1" tabindex="0" aria-label="Transcript: a person asks an agent for a table, and the agent calls the Ectype MCP server 3 times, recorded in MCP SDK client">
+<li class="turn you" data-step="say"><p class="who">You</p><p class="said">I need <span data-r="mcp.sessions.1.steps.0.arguments.rows" data-f="int">50,000</span> e-commerce orders to test a returns model: customers, order and ship dates with shipping 1 to 7 days after the order, quantities, prices, totals that add up, <span data-r="mcp.sessions.1.derived.pct_returned">3</span>% returned.</p></li>
+<li class="turn agent" data-step="say"><p class="who">Agent</p><p class="said">I’ll describe the table as a spec and create it in one call, so the rows come back checked.</p></li>
+<li class="turn call" data-step="call"><p class="who">Tool call</p><div class="card call-card"><p class="card-name"><code><span data-r="mcp.sessions.1.steps.0.tool">create_table_from_spec</span></code></p><p class="args"><span class="arg"><span class="k">output_path</span> <span class="s">&quot;orders.parquet&quot;</span></span><span class="arg"><span class="k">rows</span> <span data-r="mcp.sessions.1.steps.0.arguments.rows" data-f="int">50,000</span></span><span class="arg"><span class="k">seed</span> <span data-r="mcp.sessions.1.steps.0.arguments.seed">42</span></span><span class="arg"><span class="k">spec</span> <span data-r="mcp.sessions.1.derived.spec_columns">8</span> columns, <span data-r="mcp.sessions.1.derived.spec_derived">1</span> derived, <span data-r="mcp.sessions.1.derived.spec_rules">2</span> rules, <span data-r="mcp.sessions.1.derived.spec_correlations">1</span> correlation</span></p><details class="spec"><summary>Show the full spec</summary><pre tabindex="0"><code>{
+ &quot;name&quot;: &quot;orders&quot;,
+ &quot;columns&quot;: [
+  {&quot;name&quot;: &quot;order_id&quot;, &quot;type&quot;: &quot;identifier&quot;, &quot;kind&quot;: &quot;int_sequence&quot;},
+  {&quot;name&quot;: &quot;customer_id&quot;, &quot;type&quot;: &quot;numeric&quot;, &quot;dist&quot;: &quot;uniform&quot;, &quot;lo&quot;: 0.5, &quot;hi&quot;: 5000.5, &quot;decimals&quot;: 0, &quot;dtype&quot;: &quot;Int64&quot;},
+  {&quot;name&quot;: &quot;order_date&quot;, &quot;type&quot;: &quot;datetime&quot;, &quot;start&quot;: &quot;2024-01-01&quot;, &quot;end&quot;: &quot;2024-12-31&quot;},
+  {&quot;name&quot;: &quot;ship_date&quot;, &quot;type&quot;: &quot;datetime&quot;, &quot;start&quot;: &quot;2024-01-02&quot;, &quot;end&quot;: &quot;2025-01-07&quot;},
+  {&quot;name&quot;: &quot;quantity&quot;, &quot;type&quot;: &quot;numeric&quot;, &quot;dist&quot;: &quot;negbinom&quot;, &quot;mean&quot;: 1.5, &quot;r&quot;: 3, &quot;shift&quot;: 1},
+  {&quot;name&quot;: &quot;unit_price&quot;, &quot;type&quot;: &quot;numeric&quot;, &quot;dist&quot;: &quot;lognormal&quot;, &quot;mu&quot;: 3.4, &quot;sigma&quot;: 0.6, &quot;decimals&quot;: 2},
+  {
+   &quot;name&quot;: &quot;channel&quot;,
+   &quot;type&quot;: &quot;categorical&quot;,
+   &quot;probs&quot;: {
+    &quot;web&quot;: 0.7,
+    &quot;store&quot;: 0.3
+   }
+  },
+  {&quot;name&quot;: &quot;returned&quot;, &quot;type&quot;: &quot;boolean&quot;, &quot;p&quot;: 0.03}
+ ],
+ &quot;derived&quot;: {
+  &quot;total&quot;: &quot;round(quantity * unit_price, 2)&quot;
+ },
+ &quot;constraints&quot;: [
+  &quot;date_diff_days(ship_date, order_date) &gt;= 1&quot;,
+  &quot;date_diff_days(ship_date, order_date) &lt;= 7&quot;
+ ],
+ &quot;correlations&quot;: [
+  {
+   &quot;columns&quot;: [
+    &quot;quantity&quot;,
+    &quot;unit_price&quot;
+   ],
+   &quot;rho&quot;: -0.3
+  }
+ ]
+}</code></pre></details></div></li>
+<li class="turn result" data-step="result"><p class="who">Result</p><div class="card result-card"><p class="card-name"><code>spec_status</code> <b class="verdict"><span data-r="mcp.sessions.1.steps.0.result.spec_status">matches</span></b></p><table class="checks"><caption class="sr-only">Each column and correlation: what the spec asked for and what the rows have</caption><thead><tr><th scope="col">Checked</th><th scope="col">Asked</th><th scope="col">Got</th><th scope="col"><span class="sr-only">Match</span></th></tr></thead><tbody><tr data-step="check"><th scope="row"><code><span data-r="mcp.sessions.1.steps.0.result.checks.0.item">order_id</span></code></th><td><span data-r="mcp.sessions.1.steps.0.result.checks.0.asked">unique int_sequence</span></td><td><span data-r="mcp.sessions.1.steps.0.result.checks.0.got">50000 unique of 50000</span></td><td class="ok"><span class="sr-only">matches</span></td></tr><tr data-step="check"><th scope="row"><code><span data-r="mcp.sessions.1.steps.0.result.checks.1.item">customer_id</span></code></th><td><span data-r="mcp.sessions.1.steps.0.result.checks.1.asked">uniform 0.5 to 5000.5</span></td><td><span data-r="mcp.sessions.1.steps.0.result.checks.1.got">1 to 5000, mean 2506.1</span></td><td class="ok"><span class="sr-only">matches</span></td></tr><tr data-step="check"><th scope="row"><code><span data-r="mcp.sessions.1.steps.0.result.checks.2.item">order_date</span></code></th><td><span data-r="mcp.sessions.1.steps.0.result.checks.2.asked">spread evenly 2024-01-01 to 2024-12-31</span></td><td><span data-r="mcp.sessions.1.steps.0.result.checks.2.got">2024-01-01 to 2024-12-31, median 2024-07-01</span></td><td class="ok"><span class="sr-only">matches</span></td></tr><tr data-step="check"><th scope="row"><code><span data-r="mcp.sessions.1.steps.0.result.checks.3.item">ship_date</span></code></th><td><span data-r="mcp.sessions.1.steps.0.result.checks.3.asked">spread evenly 2024-01-02 to 2025-01-07</span></td><td><span data-r="mcp.sessions.1.steps.0.result.checks.3.got">2024-01-03 to 2025-01-07, median 2024-07-05</span></td><td class="ok"><span class="sr-only">matches</span></td></tr><tr data-step="check"><th scope="row"><code><span data-r="mcp.sessions.1.steps.0.result.checks.4.item">quantity</span></code></th><td><span data-r="mcp.sessions.1.steps.0.result.checks.4.asked">negbinom mean 2.5, sd 1.5</span></td><td><span data-r="mcp.sessions.1.steps.0.result.checks.4.got">mean 2.49, sd 1.49</span></td><td class="ok"><span class="sr-only">matches</span></td></tr><tr data-step="check"><th scope="row"><code><span data-r="mcp.sessions.1.steps.0.result.checks.5.item">unit_price</span></code></th><td><span data-r="mcp.sessions.1.steps.0.result.checks.5.asked">lognormal median 29.96</span></td><td><span data-r="mcp.sessions.1.steps.0.result.checks.5.got">median 30.14, mean 35.96</span></td><td class="ok"><span class="sr-only">matches</span></td></tr><tr data-step="check"><th scope="row"><code><span data-r="mcp.sessions.1.steps.0.result.checks.6.item">channel</span></code></th><td><span data-r="mcp.sessions.1.steps.0.result.checks.6.asked">web 0.7, store 0.3</span></td><td><span data-r="mcp.sessions.1.steps.0.result.checks.6.got">web 0.697, store 0.303</span></td><td class="ok"><span class="sr-only">matches</span></td></tr><tr data-step="check"><th scope="row"><code><span data-r="mcp.sessions.1.steps.0.result.checks.7.item">returned</span></code></th><td><span data-r="mcp.sessions.1.steps.0.result.checks.7.asked">share true 0.03</span></td><td><span data-r="mcp.sessions.1.steps.0.result.checks.7.got">0.0315</span></td><td class="ok"><span class="sr-only">matches</span></td></tr><tr data-step="check"><th scope="row"><code><span data-r="mcp.sessions.1.steps.0.result.checks.8.item">quantity ~ unit_price</span></code></th><td><span data-r="mcp.sessions.1.steps.0.result.checks.8.asked">rank correlation -0.3</span></td><td><span data-r="mcp.sessions.1.steps.0.result.checks.8.got">rank correlation -0.285</span></td><td class="ok"><span class="sr-only">matches</span></td></tr></tbody></table><p class="rules" data-step="rules"><span data-r="mcp.sessions.1.derived.rules_held">2</span> of <span data-r="mcp.sessions.1.derived.rules_total">2</span> rules hold on every row</p><p class="verdict-line" data-step="verdict"><span data-r="mcp.sessions.1.steps.0.result.summary">Wrote 50,000 rows to orders.parquet and the fingerprint to orders.dfp. All 9 checks match the spec. Validation passed.</span></p><p class="files" data-step="files">orders.parquet, 607 kB; orders.dfp, 9.7 kB</p></div></li>
+<li class="turn you" data-step="say"><p class="who">You</p><p class="said">Now give me half a million.</p></li>
+<li class="turn call" data-step="call"><p class="who">Tool call</p><div class="card call-card"><p class="card-name"><code><span data-r="mcp.sessions.1.steps.1.tool">generate_rows</span></code></p><p class="args"><span class="arg"><span class="k">fingerprint_path</span> <span class="s">&quot;orders.dfp&quot;</span></span><span class="arg"><span class="k">output_path</span> <span class="s">&quot;orders-big.parquet&quot;</span></span><span class="arg"><span class="k">rows</span> <span data-r="mcp.sessions.1.steps.1.arguments.rows" data-f="int">500,000</span></span><span class="arg"><span class="k">seed</span> <span data-r="mcp.sessions.1.steps.1.arguments.seed">1</span></span></p></div></li>
+<li class="turn result" data-step="result"><p class="who">Result</p><div class="card result-card"><p class="card-name"><code>spec_status</code> <b class="verdict"><span data-r="mcp.sessions.1.steps.1.result.spec_status">matches</span></b></p><p class="verdict-line"><span data-r="mcp.sessions.1.steps.1.result.summary">Wrote 500,000 rows to orders-big.parquet. All 9 checks match the spec.</span></p><p class="files" data-step="files">orders-big.parquet, 5.7 MB</p></div></li>
+<li class="turn you" data-step="say"><p class="who">You</p><p class="said">Check it.</p></li>
+<li class="turn call" data-step="call"><p class="who">Tool call</p><div class="card call-card"><p class="card-name"><code><span data-r="mcp.sessions.1.steps.2.tool">validate_rows</span></code></p><p class="args"><span class="arg"><span class="k">fingerprint_path</span> <span class="s">&quot;orders.dfp&quot;</span></span><span class="arg"><span class="k">table_path</span> <span class="s">&quot;orders-big.parquet&quot;</span></span></p></div></li>
+<li class="turn result" data-step="result"><p class="who">Result</p><div class="card result-card"><p class="card-name"><code>passed</code> <b class="verdict">true</b></p><dl class="vlist"><div><dt>structure</dt><dd><span data-r="mcp.sessions.1.steps.2.result.validation.structure">5/5 checks ok</span></dd></div><div><dt>rules</dt><dd><span data-r="mcp.sessions.1.steps.2.result.validation.rules">2/2 hard rules hold on every row</span></dd></div><div><dt>sealed</dt><dd><span data-r="mcp.sessions.1.steps.2.result.validation.sealed">40/40 targets passed; 0 failed beyond sampling noise</span></dd></div></dl></div></li>
+<li class="turn agent" data-step="say"><p class="who">Agent</p><p class="said">Done: <span data-r="mcp.sessions.1.steps.1.arguments.rows" data-f="int">500,000</span> orders in <code>orders-big.parquet</code>. Every rule holds on every row, and <span data-r="mcp.sessions.1.derived.sealed_passed">40</span> of <span data-r="mcp.sessions.1.derived.sealed_total">40</span> sealed checks passed.</p></li>
+</ol>
+<figcaption id="replay-cap"><span class="cap" data-session-cap="0">Recorded in Claude Code with <span data-r="mcp.sessions.0.server">ectype-mcp 0.1.0</span>.</span> <span class="cap" data-session-cap="1">Tool calls and results recorded from <span data-r="mcp.sessions.1.server">ectype-mcp 0.1.0</span>.</span></figcaption>
+<!-- /bake:mcp-demo -->
+    </figure>
+<!-- bake:mcp-tested -->
+<p class="tested-with">Tested with Claude Code.</p>
+<!-- /bake:mcp-tested -->
+    </div>
+
+    <div class="agents-side">
+      <div class="mcp-status">
+<!-- bake:mcp-status -->
+<p class="mcp-state is-coming">Coming next</p><p class="mcp-cfg-note">The server ships shortly after the engine.</p>
+<!-- /bake:mcp-status -->
+      </div>
+      <ul class="agent-facts">
+        <li>One call makes, saves and checks a table.</li>
+        <li>Rules hold on every row.</li>
+        <li>Nothing leaves the machine: no port, no network, and files only in folders you name.</li>
+      </ul>
+      <h3 class="tools-title">The seven tools</h3>
+      <dl class="tool-list">
+<!-- bake:mcp-tools -->
+<div><dt><code>create_table_from_spec</code></dt><dd>Makes a table from a short spec, saves its fingerprint and checks the rows against the spec.</dd></div>
+<div><dt><code>profile_table</code></dt><dd>Learns a fingerprint from a real table, with personal columns replaced.</dd></div>
+<div><dt><code>generate_rows</code></dt><dd>Writes any number of rows from a fingerprint.</dd></div>
+<div><dt><code>validate_rows</code></dt><dd>Checks a table against a fingerprint: structure, every rule on every row, sealed targets.</dd></div>
+<div><dt><code>compare_fingerprints</code></dt><dd>Reports drift between two fingerprints, without any data.</dd></div>
+<div><dt><code>describe_table</code></dt><dd>Describes a table&#x27;s columns and relationships without returning its values.</dd></div>
+<div><dt><code>inspect_fingerprint</code></dt><dd>Shows what a fingerprint holds, including the spec it was made from.</dd></div>
+<!-- /bake:mcp-tools -->
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- 7. Quickstart -->
+<section class="quick" id="quickstart" aria-labelledby="qs-title">
+  <div class="quick-inner">
+    <div class="quick-head">
+      <h2 id="qs-title">Take a print of your own table</h2>
+      <p>Python <span data-r="versions.python" data-f="or">3.11, 3.12 or 3.13</span>. The core depends on polars, numpy, scipy, pyarrow and pydantic.</p>
+      <button class="pip pip-dark" type="button" data-copy="pip install ectype-data" aria-label="Copy the command pip install ectype-data">
+        <code>pip install ectype-data</code><span class="pip-note" aria-hidden="true">copy</span>
+      </button>
+      <p class="status-note">Version <span data-r="versions.ectype">0.1.0</span>, <span data-r="tests.qualifier">more than</span> <span data-r="tests.count" data-f="int">2,600</span> automated tests, fingerprint format <span data-r="versions.format">0.4.0</span>.</p>
+      <p class="quick-links"><a data-site="github" href="https://github.com/EctypeHQ/ectype">Source on GitHub</a> <a data-site="pypi" href="https://pypi.org/project/ectype-data/">Package on PyPI</a> <a data-site="docs" href="https://github.com/EctypeHQ/ectype/blob/main/docs/guide/README.md">User guide</a></p>
+    </div>
+    <div class="quick-code">
+      <p class="code-note">The package is published on PyPI as <code>ectype-data</code>. You import it as <code>ectype</code>, and the command is <code>ectype</code>.</p>
+      <div class="code-block">
+        <div class="code-bar"><span>In Python</span><button type="button" class="copy" data-copy-from="code-py" aria-label="Copy the Python example">Copy</button></div>
+<pre id="code-py" tabindex="0"><code><span class="c"># installed as ectype-data, imported as ectype</span>
+<span class="kw">import</span> polars <span class="kw">as</span> pl
+<span class="kw">import</span> ectype
+
+df = pl.read_csv(<span class="s">"customers.csv"</span>)
+
+fp = ectype.fit(df)                    <span class="c"># the default model, the one benchmarked above</span>
+fp.save(<span class="s">"customers.dfp"</span>)               <span class="c"># statistics and a model, no raw rows</span>
+
+synthetic = ectype.Generator.from_fingerprint(<span class="s">"customers.dfp"</span>).generate(1_000_000, seed=42)
+
+print(ectype.validate(fp, synthetic).summary())     <span class="c"># calibration | sealed | holdout, never merged</span>
+ectype.report(fp).to_html(<span class="s">"customers-profile.html"</span>)  <span class="c"># one page that describes the table</span></code></pre>
+      </div>
+      <div class="code-block">
+        <div class="code-bar"><span>Or from the command line</span><button type="button" class="copy" data-copy-from="code-cli" aria-label="Copy the command-line example">Copy</button></div>
+<pre id="code-cli" tabindex="0"><code>ectype profile customers.csv -o customers.dfp
+ectype report customers.dfp
+ectype generate customers.dfp --rows 1000000 -o synthetic.parquet
+ectype validate customers.dfp synthetic.parquet --html report.html</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
 </main>
-<footer><p>&copy; 2026 ZeroPoint Holdings LLC. Ectype is a trademark of ZeroPoint Holdings LLC.</p></footer>
+
+<footer class="foot">
+  <p>© 2026 ZeroPoint Holdings LLC. Ectype is a trademark of ZeroPoint Holdings LLC. Apache-2.0.</p>
+  <nav class="foot-links" aria-label="Project links"><a data-site="github" href="https://github.com/EctypeHQ/ectype">GitHub</a> <a data-site="pypi" href="https://pypi.org/project/ectype-data/">PyPI</a> <a data-site="docs" href="https://github.com/EctypeHQ/ectype/blob/main/docs/guide/README.md">Docs</a></nav>
+</footer>
 </body>
 </html>

@@ -1,7 +1,7 @@
 {
- "generated_from": "benchmarks/compete results, --origins remote remote2 remote4; Ectype rows from remote4, engine 60a2094; built by site-cloud/tools/compete_summary.py",
- "report_date": "2026-11-27",
- "engine_version": "0.1.0",
+ "generated_from": "benchmarks/compete results, --origins remote remote2 remote5; Ectype rows from remote5, engine 7252fc9; built by site-cloud/tools/compete_summary.py",
+ "report_date": "2026-11-28",
+ "engine_version": "0.2.0",
  "ectype_default_kind": "chain_copula",
  "datasets": 9,
  "seeds": 5,
@@ -21,12 +21,12 @@
    "label": "Ectype",
    "kind": "ectype",
    "runs_ok": 45,
-   "classifier_auc": 0.7,
+   "classifier_auc": 0.671,
    "quality": 0.975,
    "utility_median": 0.978,
-   "membership_auc_worst_dataset": 0.508,
-   "mean_rank_classifier": 2.56,
-   "fit_seconds_median": 10.4,
+   "membership_auc_worst_dataset": 0.505,
+   "mean_rank_classifier": 2.11,
+   "fit_seconds_median": 9.8,
    "needs_gpu": false
   },
   {
@@ -34,12 +34,12 @@
    "label": "Ectype, fast",
    "kind": "ectype",
    "runs_ok": 45,
-   "classifier_auc": 0.912,
-   "quality": 0.958,
+   "classifier_auc": 0.903,
+   "quality": 0.957,
    "utility_median": 0.911,
    "membership_auc_worst_dataset": 0.503,
    "mean_rank_classifier": 6.61,
-   "fit_seconds_median": 8.6,
+   "fit_seconds_median": 6.6,
    "needs_gpu": false
   },
   {
@@ -47,12 +47,12 @@
    "label": "Ectype, forest model",
    "kind": "ectype",
    "runs_ok": 45,
-   "classifier_auc": 0.848,
-   "quality": 0.96,
+   "classifier_auc": 0.844,
+   "quality": 0.959,
    "utility_median": 0.93,
-   "membership_auc_worst_dataset": 0.505,
-   "mean_rank_classifier": 5.5,
-   "fit_seconds_median": 18.1,
+   "membership_auc_worst_dataset": 0.503,
+   "mean_rank_classifier": 5.39,
+   "fit_seconds_median": 16.7,
    "needs_gpu": false
   },
   {
@@ -61,11 +61,11 @@
    "kind": "baseline",
    "runs_ok": 45,
    "classifier_auc": 0.982,
-   "quality": 0.867,
+   "quality": 0.86,
    "utility_median": 0.511,
    "membership_auc_worst_dataset": 0.505,
    "mean_rank_classifier": null,
-   "fit_seconds_median": 8.5,
+   "fit_seconds_median": 6.8,
    "needs_gpu": false
   },
   {
@@ -90,7 +90,7 @@
    "quality": 0.98,
    "utility_median": 0.983,
    "membership_auc_worst_dataset": 0.533,
-   "mean_rank_classifier": 1.0,
+   "mean_rank_classifier": 1.11,
    "fit_seconds_median": 1.8,
    "needs_gpu": false
   },
@@ -129,7 +129,7 @@
    "quality": 0.896,
    "utility_median": 0.899,
    "membership_auc_worst_dataset": 0.505,
-   "mean_rank_classifier": 8.0,
+   "mean_rank_classifier": 8.11,
    "fit_seconds_median": 174.8,
    "needs_gpu": true
   },
@@ -142,7 +142,7 @@
    "quality": 0.966,
    "utility_median": 0.963,
    "membership_auc_worst_dataset": 0.507,
-   "mean_rank_classifier": 3.67,
+   "mean_rank_classifier": 3.89,
    "fit_seconds_median": 138.7,
    "needs_gpu": true
   },
@@ -155,7 +155,7 @@
    "quality": 0.908,
    "utility_median": 0.973,
    "membership_auc_worst_dataset": 0.505,
-   "mean_rank_classifier": 3.44,
+   "mean_rank_classifier": 3.56,
    "fit_seconds_median": 385.4,
    "needs_gpu": true
   },
@@ -235,9 +235,9 @@
    "synthcity-ddpm": 0.617
   },
   "beijing_pm25": {
-   "ectype": 0.7,
-   "ectype-fast": 0.936,
-   "ectype-forest": 0.823,
+   "ectype": 0.682,
+   "ectype-fast": 0.944,
+   "ectype-forest": 0.824,
    "sdv-gaussiancopula": 1.0,
    "cart": 0.54,
    "arf": 0.999,
@@ -259,9 +259,9 @@
    "synthcity-ddpm": 1.0
   },
   "california_housing": {
-   "ectype": 0.712,
-   "ectype-fast": 0.908,
-   "ectype-forest": 0.743,
+   "ectype": 0.571,
+   "ectype-fast": 0.82,
+   "ectype-forest": 0.716,
    "sdv-gaussiancopula": 1.0,
    "cart": 0.576,
    "arf": 0.989,
@@ -271,9 +271,9 @@
    "synthcity-ddpm": 0.582
   },
   "covertype": {
-   "ectype": 0.866,
+   "ectype": 0.769,
    "ectype-fast": 0.996,
-   "ectype-forest": 0.989,
+   "ectype-forest": 0.985,
    "sdv-gaussiancopula": 0.999,
    "cart": 0.554,
    "arf": 0.961,
@@ -300,8 +300,12 @@
   "leader": {
    "id": "cart",
    "label": "CART (sequential trees)",
-   "wins": 9,
+   "wins": 8,
    "membership_auc_worst_dataset": 0.533
+  },
+  "default_wins": {
+   "count": 1,
+   "names": "California Housing"
   },
   "tuned": {
    "count": 2,
@@ -313,12 +317,12 @@
     "label": "Ectype",
     "kind": "ectype",
     "runs_ok": 45,
-    "classifier_auc": 0.7,
+    "classifier_auc": 0.671,
     "quality": 0.975,
     "utility_median": 0.978,
-    "membership_auc_worst_dataset": 0.508,
-    "mean_rank_classifier": 2.56,
-    "fit_seconds_median": 10.4,
+    "membership_auc_worst_dataset": 0.505,
+    "mean_rank_classifier": 2.11,
+    "fit_seconds_median": 9.8,
     "needs_gpu": false,
     "runs_failed": 0
    },
@@ -327,12 +331,12 @@
     "label": "Ectype, fast",
     "kind": "ectype",
     "runs_ok": 45,
-    "classifier_auc": 0.912,
-    "quality": 0.958,
+    "classifier_auc": 0.903,
+    "quality": 0.957,
     "utility_median": 0.911,
     "membership_auc_worst_dataset": 0.503,
     "mean_rank_classifier": 6.61,
-    "fit_seconds_median": 8.6,
+    "fit_seconds_median": 6.6,
     "needs_gpu": false,
     "runs_failed": 0
    },
@@ -341,12 +345,12 @@
     "label": "Ectype, forest model",
     "kind": "ectype",
     "runs_ok": 45,
-    "classifier_auc": 0.848,
-    "quality": 0.96,
+    "classifier_auc": 0.844,
+    "quality": 0.959,
     "utility_median": 0.93,
-    "membership_auc_worst_dataset": 0.505,
-    "mean_rank_classifier": 5.5,
-    "fit_seconds_median": 18.1,
+    "membership_auc_worst_dataset": 0.503,
+    "mean_rank_classifier": 5.39,
+    "fit_seconds_median": 16.7,
     "needs_gpu": false,
     "runs_failed": 0
    },
@@ -356,11 +360,11 @@
     "kind": "baseline",
     "runs_ok": 45,
     "classifier_auc": 0.982,
-    "quality": 0.867,
+    "quality": 0.86,
     "utility_median": 0.511,
     "membership_auc_worst_dataset": 0.505,
     "mean_rank_classifier": null,
-    "fit_seconds_median": 8.5,
+    "fit_seconds_median": 6.8,
     "needs_gpu": false,
     "runs_failed": 0
    },
@@ -387,7 +391,7 @@
     "quality": 0.98,
     "utility_median": 0.983,
     "membership_auc_worst_dataset": 0.533,
-    "mean_rank_classifier": 1.0,
+    "mean_rank_classifier": 1.11,
     "fit_seconds_median": 1.8,
     "needs_gpu": false,
     "runs_failed": 0
@@ -429,7 +433,7 @@
     "quality": 0.896,
     "utility_median": 0.899,
     "membership_auc_worst_dataset": 0.505,
-    "mean_rank_classifier": 8.0,
+    "mean_rank_classifier": 8.11,
     "fit_seconds_median": 174.8,
     "needs_gpu": true,
     "runs_failed": 0
@@ -443,7 +447,7 @@
     "quality": 0.966,
     "utility_median": 0.963,
     "membership_auc_worst_dataset": 0.507,
-    "mean_rank_classifier": 3.67,
+    "mean_rank_classifier": 3.89,
     "fit_seconds_median": 138.7,
     "needs_gpu": true,
     "runs_failed": 0
@@ -457,7 +461,7 @@
     "quality": 0.908,
     "utility_median": 0.973,
     "membership_auc_worst_dataset": 0.505,
-    "mean_rank_classifier": 3.44,
+    "mean_rank_classifier": 3.56,
     "fit_seconds_median": 385.4,
     "needs_gpu": true,
     "runs_failed": 2

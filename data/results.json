@@ -6,7 +6,7 @@
     "python": ["3.11", "3.12", "3.13"]
   },
   "tests": {
-    "count": 3383,
+    "count": 3384,
     "qualifier": ""
   },
   "validation": {

@@ -446,7 +446,7 @@ RESULT: <span class="pass">PASSED</span></span></span></code></pre>
   <div class="split-head">
     <h2 id="agents-title">Give your agent a data tool</h2>
     <div>
-      <p>With Ectype’s MCP server, coming next as a separate package, an agent describes a table in a short spec and gets back checked rows. Until then, agents can call the library and command line.</p>
+      <p>With Ectype’s MCP server, a separate package, an agent describes a table in a short spec and gets back checked rows. Agents can also call the library and command line directly.</p>
     </div>
   </div>
 
@@ -553,7 +553,17 @@ RESULT: <span class="pass">PASSED</span></span></span></code></pre>
     <div class="agents-side">
       <div class="mcp-status">
 <!-- bake:mcp-status -->
-<p class="mcp-state is-coming">Coming next</p><p class="mcp-cfg-note">The server ships shortly after the engine.</p>
+<p class="mcp-state is-available">Available</p><button class="pip" type="button" data-copy="pip install ectype-mcp" aria-label="Copy the command pip install ectype-mcp"><code>pip install ectype-mcp</code><span class="pip-note" aria-hidden="true">copy</span></button><p class="mcp-cfg-note">Add it to any MCP client with a configuration of this shape. Every file the server reads or writes stays inside the --root folders you name.</p><pre class="mcp-cfg" tabindex="0" aria-label="MCP client configuration"><code>{
+  &quot;mcpServers&quot;: {
+    &quot;ectype&quot;: {
+      &quot;command&quot;: &quot;ectype-mcp&quot;,
+      &quot;args&quot;: [
+        &quot;--root&quot;,
+        &quot;/path/to/project&quot;
+      ]
+    }
+  }
+}</code></pre>
 <!-- /bake:mcp-status -->
       </div>
       <ul class="agent-facts">

@@ -1,5 +1,5 @@
 $ ectype --version
-ectype 0.1.0 (format 0.4.0)
+ectype 0.2.0 (format 0.5.0)
 [exit 0]
 
 $ ectype profile beijing-2013.parquet -o beijing-2013.dfp --name "Beijing air quality, 2013"
@@ -18,11 +18,11 @@ wrote beijing-2014.dfp
 
 $ ectype report beijing-2013.dfp
 Beijing air quality, 2013: 8,760 rows x 12 columns
-Policy standard, format 0.4.0
-Columns: 10 modeled, 1 modeled as a gap, 1 constant
+Policy standard, format 0.5.0
+Columns: 11 modeled, 1 constant
 Structure: 1 ordering
 Alerts: 0 worth acting on, 4 notes
-wrote beijing-2013-report.html (94 KB, 12 columns, full detail)
+wrote beijing-2013-report.html (92 KB, 12 columns, full detail)
 [exit 0]
 
 $ ectype report beijing-2013.dfp beijing-2014.dfp

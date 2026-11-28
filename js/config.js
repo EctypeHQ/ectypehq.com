@@ -8,4 +8,7 @@ export const SITE = {
   compete: "https://github.com/EctypeHQ/ectype/blob/main/docs/results/compete.md",
   usecases: "https://github.com/EctypeHQ/ectype/blob/main/docs/use-cases.md",
   privacy: "https://github.com/EctypeHQ/ectype/blob/main/docs/guide/12-privacy.md",
+  privacyref: "https://github.com/EctypeHQ/ectype/blob/main/docs/results/privacy-reference.md",
+  release: "https://github.com/EctypeHQ/ectype/releases/tag/v0.2.0",
+  mcp: "https://github.com/EctypeHQ/ectype-mcp",
 };

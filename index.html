@@ -109,7 +109,8 @@
       <h2 id="how-title">A fingerprint is a file you can read</h2>
       <div>
         <p>Measurements and a model, never raw rows. Inspect it, diff it, commit it.</p>
-        <p class="size-note">The fingerprint behind Fig. 3: <strong data-r="demo.fingerprint_bytes" data-f="kb">335.8 kB</strong> for a <span data-r="demo.dataset.rows_train" data-f="int">24,000</span>-row table.</p>
+        <p>It models places as coordinate pairs, times of day, identifiers in their own formats, columns that copy each other, entity attributes and replicate weights. <a class="more" data-site="release" href="https://github.com/EctypeHQ/ectype/releases/tag/v0.2.0">New in 0.2</a></p>
+        <p class="size-note">The fingerprint behind Fig. 3: <strong data-r="demo.fingerprint_bytes" data-f="kb">335.9 kB</strong> for a <span data-r="demo.dataset.rows_train" data-f="int">24,000</span>-row table.</p>
       </div>
     </div>
 
@@ -209,14 +210,13 @@
   joint model: chain_copula (effort="balanced", the default)
   5 suggested constraints (review with: ectype constraints customers.dfp --list)
   <span class="warn">warning: small table (1000 rows): stored quantiles are coarse by policy</span></span></span><span class="blk"><span class="cmd">ectype generate customers.dfp --rows 5000 --seed 42 -o synthetic.parquet</span><span class="out">wrote 5000 rows to synthetic.parquet
-  <span class="dim">seed=42 chunk_size=100000 chunks=1 acceptance=1.000 time=0.09s
-  note: constraint 'user_1' holds by construction (…); still checked on every row</span></span></span><span class="blk"><span class="cmd">ectype validate customers.dfp synthetic.parquet --html report.html</span><span class="out">Validation <span class="pass">PASSED</span>  fingerprint 19f9bc3d9701  policy=standard  rows=5000
-  structural   5/5 checks ok
-  constraints  1/1 hard constraints satisfied
-  <span class="dim">calibration  44/46 passed (95.7%) (optimizer evidence only)</span><span class="mk" aria-hidden="true">1</span>
-  <span class="lit">sealed       39/40 passed (97.5%) (primary evidence of fidelity)</span><span class="mk" aria-hidden="true">2</span>
-               <span class="lit">0 failed beyond sampling noise (sensitivity standard, FDR q=0.05)</span><span class="mk" aria-hidden="true">3</span>
-  calibration - sealed pass-rate gap: -1.8 pts
+  <span class="dim">seed=42 chunk_size=100000 chunks=1 acceptance=1.000 time=0.18s
+  note: constraint 'user_1' holds by construction (…); still checked on every row</span></span></span><span class="blk"><span class="cmd">ectype validate customers.dfp synthetic.parquet --html report.html</span><span class="out">Validation <span class="pass">PASSED</span>  fingerprint fc7086b09cd8  policy=standard  rows=5000
+  structural   5/5 checks ok (columns, types, identifiers, row count)
+  constraints  1/1 hard constraints hold on every row
+  <span class="dim">calibration  44/46 statistics within tolerance (95.7%); used in tuning, …</span><span class="mk" aria-hidden="true">1</span>
+  <span class="lit">sealed       39/40 statistics within tolerance (97.5%); never used in tuning: …</span><span class="mk" aria-hidden="true">2</span>
+               <span class="lit">0 fail beyond sampling noise (sensitivity standard: …)</span><span class="mk" aria-hidden="true">3</span>
 wrote report.html
 RESULT: <span class="pass">PASSED</span></span></span></code></pre>
       </div>
@@ -239,7 +239,7 @@ RESULT: <span class="pass">PASSED</span></span></span></code></pre>
     <figure class="pshot" aria-labelledby="pshot-a-cap">
       <div class="pshot-plate">
         <p class="pshot-bar"><code>ectype report beijing-2013.dfp</code></p>
-        <img src="img/report-profile.webp" width="1600" height="1218" loading="lazy" decoding="async" alt="Six column cards from the profile report: TEMP, drawn as its gap above DEWP, and PRES as histograms with their medians marked, cbwd as bars of wind-direction shares, Iws with its point masses drawn apart from the curve, and Is and Ir, where one value holds most rows.">
+        <img src="img/report-profile.webp" width="1600" height="1218" loading="lazy" decoding="async" alt="Six column cards from the profile report: TEMP and PRES as histograms with their medians marked, cbwd as bars of wind-direction shares, Iws with its point masses drawn apart from the curve, and Is and Ir, where one value holds most rows.">
       </div>
       <figcaption id="pshot-a-cap">Six of <span data-r="profile.columns" data-f="int">12</span> column cards: a year of hourly air quality in Beijing, <span data-r="profile.rows" data-f="int">8,760</span> rows (<span data-r="profile.source">UCI Beijing PM2.5, public, CC BY 4.0</span>). <a href="example-report.html">Open the full report</a></figcaption>
     </figure>
@@ -379,7 +379,7 @@ RESULT: <span class="pass">PASSED</span></span></span></code></pre>
 
     <figcaption id="fig3-cap">
       <p class="status" data-status hidden></p>
-      <span class="fig-no">Fig. 3.</span> Real output of ectype <span data-r="demo.engine.version">0.1.0</span> at its defaults on the public UCI Default of Credit Card Clients table (CC BY 4.0), fitted on <span data-r="demo.dataset.rows_train" data-f="int">24,000</span> rows. <b>a</b>, <span data-r="demo.dataset.rows_holdout" data-f="int">6,000</span> held-out real rows. <b>b</b>, as many generated rows. <b>c–f</b>, histograms: purple outline real, bars panel b; TV is total-variation distance (0 is identical). One run.
+      <span class="fig-no">Fig. 3.</span> Real output of ectype <span data-r="demo.engine.version">0.2.0</span> at its defaults on the public UCI Default of Credit Card Clients table (CC BY 4.0), fitted on <span data-r="demo.dataset.rows_train" data-f="int">24,000</span> rows. <b>a</b>, <span data-r="demo.dataset.rows_holdout" data-f="int">6,000</span> held-out real rows. <b>b</b>, as many generated rows. <b>c–f</b>, histograms: purple outline real, bars panel b; TV is total-variation distance (0 is identical). One run.
     </figcaption>
   </figure>
 </section>
@@ -403,16 +403,16 @@ RESULT: <span class="pass">PASSED</span></span></span></code></pre>
     </li>
     <li>
       <h3>Privacy, measured</h3>
-      <p>Every fit runs under a disclosure policy; a built-in attack suite measures what an attacker could learn. Measured, not a formal bound such as differential privacy.</p>
-      <p class="more-line"><a class="more" data-site="privacy" href="https://github.com/EctypeHQ/ectype/blob/main/docs/guide/12-privacy.md">How privacy is measured</a></p>
+      <p>Every fit runs under a disclosure policy; a built-in attack suite measures what an attacker could learn, copied rows included. Checked with Anonymeter too: in 24 of 27 comparisons on the nine benchmark tables, attackers did no better with Ectype’s rows than with real rows it never saw.</p>
+      <p class="more-line"><a class="more" data-site="privacyref" href="https://github.com/EctypeHQ/ectype/blob/main/docs/results/privacy-reference.md">Results with outside tools</a></p>
     </li>
     <li>
       <h3>Rules on every row</h3>
-      <p>Dates stay in order, totals add up, and rules you declare, such as <code>start &lt;= end</code>, hold on every row. Multi-table schemas keep <span data-r="claims.referential_integrity_pct" data-f="int">100</span>% referential integrity.</p>
+      <p>Dates stay in order, totals add up, and rules you declare, such as <code>start &lt;= end</code>, hold on every row. Panels keep one row per entity and period, scenarios keep the relationships their inputs share, and multi-table schemas keep <span data-r="claims.referential_integrity_pct" data-f="int">100</span>% referential integrity.</p>
     </li>
     <li>
       <h3>Local, and safe to load</h3>
-      <p>No cloud, GPU or LLM: a <span data-r="scale.rows" data-f="million1">2.4 million</span>-row, <span data-r="scale.columns" data-f="int">78</span>-column table fits on a desktop CPU. Loading a <code>.dfp</code> never runs code.</p>
+      <p>No cloud, GPU or LLM: a <span data-r="scale.rows" data-f="million1">2.4 million</span>-row, <span data-r="scale.columns" data-f="int">78</span>-column table fits on a desktop CPU, and large tables fit faster, in bounded time. Loading a <code>.dfp</code> never runs code.</p>
     </li>
   </ul>
 </section>
@@ -571,6 +571,7 @@ RESULT: <span class="pass">PASSED</span></span></span></code></pre>
         <li>Rules hold on every row.</li>
         <li>Nothing leaves the machine.</li>
       </ul>
+      <p class="more-line"><a class="more" data-site="mcp" href="https://github.com/EctypeHQ/ectype-mcp">ectype-mcp on GitHub</a></p>
     </div>
   </div>
 </section>

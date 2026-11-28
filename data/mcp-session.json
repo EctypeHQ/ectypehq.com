@@ -159,14 +159,14 @@
    }
   },
   {
-   "recorded": "2026-11-26",
+   "recorded": "2026-11-28",
    "server": "ectype-mcp 0.1.0",
-   "engine": "ectype-data 0.1.0",
+   "engine": "ectype-data 0.2.0",
    "client": "",
    "recorded_in": "MCP SDK client",
    "files": {
     "orders.parquet": 606836,
-    "orders.dfp": 9681,
+    "orders.dfp": 9680,
     "orders-big.parquet": 5671363
    },
    "steps": [
